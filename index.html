@@ -1,0 +1,3689 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rojak Admin</title>
+<link rel="icon" type="image/png" href="assets/logo.png">
+<style>
+  :root{
+    --ink:#1A1A1D;
+    --ink-2:#1E1E21;
+    --ink-3:#38383C;
+    --paper:#101012;
+    --surface:#1F1F22;
+    --surface-2:#28282C;
+    --line:rgba(255,255,255,0.09);
+    --text:#F3F2F0;
+    --text-soft:#9B9B9E;
+    --text-on-dark:#F3F2F0;
+    --text-on-dark-soft:#9B9B9E;
+    --chrome-bg:#1A1A1D;
+    --chrome-text:#F3F2F0;
+    --chrome-text-soft:#9B9B9E;
+    --chrome-line:rgba(255,255,255,0.10);
+    --chrome-overlay:rgba(255,255,255,0.08);
+    --row-hover:rgba(255,255,255,0.025);
+    --chrome-accent:#FF6A00;
+    --accent:#FF6A00;
+    --accent-2:#FFA35C;
+    --accent-2-text:#FFA35C;
+    --accent-ink:#1C1C1E;
+    --accent-soft:rgba(255,106,0,0.18);
+    --good:#34D399;
+    --good-soft:rgba(52,211,153,0.15);
+    --good-text:#34D399;
+    --bad:#F16863;
+    --bad-soft:rgba(241,104,99,0.15);
+    --bad-text:#F16863;
+    --radius-s:8px;
+    --radius-m:12px;
+    --radius-l:18px;
+    --shadow-card:0 1px 0 rgba(255,255,255,0.03) inset, 0 10px 26px -12px rgba(0,0,0,0.55);
+    --series-1:#3987e5; --series-2:#199e70; --series-3:#9085e9;
+    --status-good:#0ca30c; --status-warning:#fab219; --status-critical:#d03b3b;
+    --grid:#2e2e32; --axis:#3d3d42; --muted:#898781;
+  }
+
+  :root[data-theme="light"]{
+    color-scheme:light;
+    --ink-2:#EFEDEA;
+    --paper:#F4F3F1;
+    --surface:#FFFFFF;
+    --surface-2:#F6F5F3;
+    --line:rgba(0,0,0,0.10);
+    --text:#1C1C1E;
+    --text-soft:#6B6B6F;
+    --chrome-bg:#FFFFFF;
+    --chrome-text:#1C1C1E;
+    --chrome-text-soft:#6B6B6F;
+    --chrome-line:rgba(0,0,0,0.10);
+    --chrome-overlay:rgba(0,0,0,0.05);
+    --row-hover:rgba(0,0,0,0.03);
+    --good-text:#057A55;
+    --bad-text:#C81E1E;
+    --accent-2-text:#B34500;
+    --chrome-accent:#B34500;
+    --series-1:#2a78d6; --series-2:#1baf7a; --series-3:#4a3aa7;
+    --grid:#ebe9e4; --axis:#c3c2b7;
+  }
+
+  *{box-sizing:border-box;}
+  :root{color-scheme:dark;}
+  html{background:var(--paper); margin:0;}
+  body{
+    background:var(--paper);
+    color:var(--text);
+    font-family:"Montserrat", "Segoe UI", -apple-system, sans-serif;
+    padding-inline:0;
+    margin:0;
+    min-height:100%;
+  }
+  html,body{height:100%;}
+  h1,h2,h3{text-wrap:balance; margin:0;}
+  button{font-family:inherit;}
+  ::selection{background:var(--accent-soft);}
+
+  .view{min-height:100%; width:100%;}
+  [hidden]{display:none!important;}
+
+  /* ---------- LOGIN VIEW ---------- */
+  #view-login{
+    position:relative; overflow:hidden;
+    min-height:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:var(--ink);
+    padding: max(24px, env(safe-area-inset-top,0px)) 16px max(24px, env(safe-area-inset-bottom,0px));
+  }
+  @keyframes kenburns{
+    from{transform:scale(1);}
+    to{transform:scale(1.12);}
+  }
+  .login-slideshow{position:absolute; inset:0; z-index:0; overflow:hidden;}
+  .login-slide{
+    position:absolute; inset:0;
+    background-size:cover; background-position:center; background-repeat:no-repeat;
+    opacity:0; transition:opacity 1.4s ease;
+    animation:kenburns 20s ease-in-out infinite alternate;
+  }
+  .login-slide:nth-child(odd){transform-origin:25% 35%;}
+  .login-slide:nth-child(even){transform-origin:75% 65%;}
+  .login-slide.active{opacity:1;}
+  .login-scrim{
+    position:absolute; inset:0; z-index:1;
+    background:
+      radial-gradient(60% 50% at 50% 18%, rgba(255,106,0,0.18), transparent 70%),
+      linear-gradient(180deg, rgba(16,16,18,0.32) 0%, rgba(16,16,18,0.5) 55%, rgba(16,16,18,0.68) 100%);
+  }
+  .login-card{
+    position:relative; z-index:2;
+    width:100%;
+    max-width:392px;
+    background:var(--surface);
+    border-radius:var(--radius-l);
+    box-shadow:0 30px 60px -20px rgba(0,0,0,0.55);
+    padding:36px 32px 28px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:18px;
+    text-align:center;
+  }
+  .login-emblem{
+    width:76px; height:76px;
+    border-radius:100%;
+    overflow:hidden;
+    background:#1e0606;
+    border:1px solid rgba(0,0,0,0.08);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .login-emblem img{width:100%; height:100%; object-fit:cover;}
+  .lockup{display:flex; flex-direction:column; gap:4px;}
+  .lockup .word{
+    font-weight:800; font-size:22px; letter-spacing:0.01em;
+    color:var(--text);
+  }
+  .lockup .word span{color:var(--accent);}
+  .lockup .sub{font-size:13px; color:var(--text-soft); font-weight:500; max-width:280px;}
+
+  .btn-google{
+    width:100%;
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    padding:12px 18px;
+    border-radius:var(--radius-s);
+    border:1px solid rgba(0,0,0,0.12);
+    background:#fff;
+    font-weight:600; font-size:14px; color:#1C1C1E;
+    cursor:pointer;
+    transition:background .15s ease, box-shadow .15s ease;
+  }
+  .btn-google:hover{background:#F4F3F2;}
+  .btn-google:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+  .g-mark{width:18px; height:18px; flex:none;}
+
+  .login-note{
+    font-size:11.5px; line-height:1.5; color:var(--text-soft);
+    max-width:290px; font-weight:500;
+  }
+  .login-foot{
+    margin-top:6px;
+    font-size:11px; color:var(--text-on-dark-soft); font-weight:600;
+    letter-spacing:.04em; text-transform:uppercase;
+  }
+  .spin{
+    width:14px; height:14px; border-radius:50%;
+    border:2px solid rgba(28,28,30,0.18); border-top-color:var(--text);
+    animation:spin .7s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  @keyframes btn-reaction-pop{
+    0%{transform:scale(.3) rotate(-12deg); opacity:0;}
+    55%{transform:scale(1.4) rotate(8deg); opacity:1;}
+    75%{transform:scale(1.05) rotate(-2deg);}
+    100%{transform:scale(1.15) rotate(0deg);}
+  }
+  .btn-reacting{
+    display:flex !important; align-items:center; justify-content:center;
+    cursor:default;
+  }
+  .btn-reaction-icon{
+    display:inline-flex;
+    animation:btn-reaction-pop .5s cubic-bezier(.34,1.56,.64,1) forwards;
+    filter:drop-shadow(0 1px 3px rgba(0,0,0,0.35));
+  }
+  .btn-reaction-icon.icon-trash{color:var(--bad-text);}
+  @keyframes btn-wave{
+    0%{transform:scale(.3) rotate(0deg); opacity:0;}
+    30%{transform:scale(1.3) rotate(-20deg); opacity:1;}
+    45%{transform:scale(1.25) rotate(20deg);}
+    60%{transform:scale(1.25) rotate(-15deg);}
+    75%{transform:scale(1.2) rotate(10deg);}
+    100%{transform:scale(1.1) rotate(0deg);}
+  }
+  .btn-reaction-icon.icon-wave{
+    animation:btn-wave .65s ease-in-out forwards;
+  }
+  /* Hide: eye pops in, lid closes, closed eye with lashes remains */
+  @keyframes eye-shut{
+    0%{transform:scaleY(1); opacity:1;}
+    100%{transform:scaleY(.08); opacity:0;}
+  }
+  @keyframes eye-closed-in{
+    0%{opacity:0; transform:translateY(-2px);}
+    100%{opacity:1; transform:translateY(0);}
+  }
+  .btn-reaction-icon.icon-eyeoff .eye-open{
+    transform-box:view-box; transform-origin:12px 12px;
+    animation:eye-shut .22s .22s ease-in forwards;
+  }
+  .btn-reaction-icon.icon-eyeoff .eye-closed{
+    opacity:0;
+    animation:eye-closed-in .16s .42s ease-out forwards;
+  }
+  /* Show: the reverse — closed eye pops in, lashes fade, eye opens */
+  .btn-reaction-icon.icon-eyeon .eye-closed{
+    animation:eye-closed-in .16s .22s ease-in reverse both;
+  }
+  .btn-reaction-icon.icon-eyeon .eye-open{
+    transform-box:view-box; transform-origin:12px 12px;
+    animation:eye-shut .24s .34s ease-out reverse both;
+  }
+
+  @keyframes row-flash{
+    0%{background-color:rgba(52,211,153,0.32);}
+    100%{background-color:transparent;}
+  }
+  tr.row-flash{animation:row-flash 1.6s ease-out;}
+
+  @keyframes cha-ching-pop{
+    0%{transform:scale(.2) rotate(0deg) translateY(0); opacity:0;}
+    35%{transform:scale(1.3) rotate(180deg) translateY(-8px); opacity:1;}
+    55%{transform:scale(1.05) rotate(300deg) translateY(-4px); opacity:1;}
+    75%{transform:scale(1.15) rotate(360deg) translateY(-6px); opacity:1;}
+    100%{transform:scale(1) rotate(360deg) translateY(0); opacity:0;}
+  }
+  .qris-coin{
+    display:inline-flex; margin-left:6px; vertical-align:middle;
+    color:var(--good-text);
+    filter:drop-shadow(0 1px 3px rgba(0,0,0,0.35));
+    animation:cha-ching-pop 1.1s cubic-bezier(.34,1.56,.64,1) forwards;
+  }
+
+  @keyframes detail-content-in{
+    from{opacity:0; transform:translateY(-6px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+  .detail-inner, .reject-panel{animation:detail-content-in .2s ease;}
+
+  @keyframes search-shake{
+    10%,90%{transform:translateX(-1px);}
+    20%,80%{transform:translateX(2px);}
+    30%,50%,70%{transform:translateX(-4px);}
+    40%,60%{transform:translateX(4px);}
+  }
+  .search.shake{animation:search-shake .4s ease;}
+
+  /* ---------- APP SHELL ---------- */
+  #view-app{display:flex; flex-direction:column; min-height:100%;}
+
+  .topbar{
+    position:sticky; top:0; z-index:20;
+    background:var(--chrome-bg);
+    color:var(--chrome-text);
+    display:flex; align-items:center; justify-content:space-between;
+    gap:12px;
+    padding:12px max(20px,16px);
+    padding-top:calc(12px + env(safe-area-inset-top,0px));
+    border-bottom:1px solid var(--chrome-line);
+    flex:none;
+  }
+  .brand{display:flex; align-items:center; gap:10px; min-width:0;}
+  .brand-mark{width:30px; height:30px; border-radius:50%; overflow:hidden; flex:none; background:#fff; border:1px solid var(--chrome-line);}
+  .brand-mark img{width:100%; height:100%; object-fit:cover;}
+  .brand-word{font-weight:800; font-size:15px; letter-spacing:.02em; white-space:nowrap;}
+  .brand-word span{color:var(--chrome-accent); font-weight:700;}
+
+  .topbar-left{display:flex; align-items:center; gap:10px; min-width:0;}
+  .topbar-right{display:flex; align-items:center; gap:14px; flex:none;}
+
+  .menu-toggle{
+    display:none; flex:none;
+    background:none; border:1px solid var(--chrome-line); color:var(--chrome-text);
+    border-radius:var(--radius-s); padding:7px; cursor:pointer;
+    align-items:center; justify-content:center;
+  }
+  .menu-toggle:hover{background:var(--chrome-overlay);}
+
+  .sidebar-overlay{
+    display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5);
+    z-index:39; opacity:0; visibility:hidden;
+    transition:opacity .2s ease, visibility .2s ease;
+  }
+  .sidebar-overlay.show{opacity:1; visibility:visible;}
+
+  .account{position:relative; display:flex; align-items:center;}
+  .avatar{
+    width:28px; height:28px; border-radius:50%;
+    background:var(--accent); color:var(--accent-ink);
+    display:flex; align-items:center; justify-content:center;
+    font-weight:700; font-size:12px; flex:none;
+  }
+  .account-email{font-size:12.5px; color:var(--chrome-text-soft); font-weight:500; white-space:nowrap;}
+
+  .account-trigger{
+    display:flex; align-items:center; gap:9px;
+    background:none; border:1px solid transparent; color:var(--chrome-text);
+    padding:5px 8px 5px 5px; border-radius:999px; cursor:pointer;
+  }
+  .account-trigger:hover{background:var(--chrome-overlay);}
+  .account-trigger .chevron{flex:none; opacity:.6; transition:transform .15s ease;}
+  .account-trigger[aria-expanded="true"] .chevron{transform:rotate(180deg);}
+
+  .account-menu{
+    position:absolute; top:calc(100% + 10px); right:0; z-index:45;
+    width:230px; max-width:calc(100vw - 32px);
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-m);
+    box-shadow:0 20px 44px -16px rgba(0,0,0,0.6);
+    padding:14px; display:flex; flex-direction:column; gap:4px;
+    transform-origin:top right;
+    opacity:0; transform:translateY(-6px) scale(.96);
+    transition:opacity .16s ease, transform .16s cubic-bezier(.34,1.56,.64,1);
+    pointer-events:none;
+  }
+  .account-menu.show{opacity:1; transform:translateY(0) scale(1); pointer-events:auto;}
+  .account-menu-name{font-size:13.5px; font-weight:700; color:var(--text);}
+  .account-menu-email{font-size:12px; color:var(--text-soft); font-weight:500;}
+  .role-badge{
+    align-self:flex-start; margin-top:8px; margin-bottom:6px;
+    font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.05em;
+    padding:3px 9px; border-radius:999px; background:var(--accent-soft); color:var(--accent-2-text);
+  }
+  .account-menu-sep{height:1px; background:var(--line); margin:2px 0 6px;}
+  .lang-switch, .theme-switch{
+    position:relative; display:flex; gap:3px;
+    background:var(--paper); border:1px solid var(--line); border-radius:999px; padding:3px;
+  }
+  .theme-switch{margin-top:6px;}
+  .switch-thumb{
+    position:absolute; top:3px; left:3px; bottom:3px;
+    width:calc(50% - 3px);
+    background:var(--accent); border-radius:999px;
+    transition:transform .25s cubic-bezier(.4,0,.2,1);
+  }
+  .switch-thumb.pos-1{transform:translateX(100%);}
+  .lang-btn, .theme-btn{
+    position:relative; z-index:1;
+    flex:1; background:none; border:none; color:var(--text-soft);
+    font-size:11.5px; font-weight:700; padding:6px 0; border-radius:999px; cursor:pointer;
+    transition:color .2s ease;
+  }
+  .lang-btn.active, .theme-btn.active{color:var(--accent-ink);}
+  .logout-btn{
+    display:flex; align-items:center; gap:8px;
+    background:none; border:1px solid var(--line); color:var(--text-soft);
+    font-size:12.5px; font-weight:700; padding:8px 12px; border-radius:var(--radius-s); cursor:pointer; text-align:left;
+  }
+  .logout-btn svg{flex:none;}
+  .logout-btn:hover{border-color:var(--bad); color:var(--bad-text);}
+
+  .shell-body{display:flex; flex:1; min-height:0; opacity:1; transition:opacity .1s ease;}
+  .shell-body.fading{opacity:0;}
+
+  .sidebar{
+    position:relative;
+    width:236px; flex:none;
+    background:var(--chrome-bg);
+    color:var(--chrome-text);
+    padding:18px 12px 18px;
+    display:flex; flex-direction:column; gap:2px;
+    border-right:1px solid var(--chrome-line);
+    padding-bottom:calc(18px + env(safe-area-inset-bottom,0px));
+  }
+  .nav-thumb{
+    position:absolute; left:12px; right:12px; top:0; height:0; opacity:0;
+    background:rgba(255,106,0,0.16); border-radius:var(--radius-s);
+    transition:top .22s cubic-bezier(.4,0,.2,1), height .22s cubic-bezier(.4,0,.2,1), opacity .15s ease;
+    z-index:0; pointer-events:none;
+  }
+  .nav-label{
+    position:relative; z-index:1;
+    font-size:10.5px; font-weight:700; letter-spacing:.09em; text-transform:uppercase;
+    color:var(--chrome-text-soft); padding:10px 10px 6px;
+  }
+  .nav-item{
+    position:relative; z-index:1;
+    display:flex; align-items:center; justify-content:space-between; gap:8px;
+    padding:9px 10px; border-radius:var(--radius-s);
+    font-size:13.5px; font-weight:600; color:var(--chrome-text-soft);
+    cursor:pointer; border:none; background:none; width:100%; text-align:left;
+    transition:color .2s ease;
+  }
+  .nav-item.active{color:var(--chrome-accent);}
+  .nav-item[disabled]{cursor:default; opacity:.55;}
+  .nav-item-main{display:flex; align-items:center; gap:9px; min-width:0; flex:1;}
+  .nav-icon{flex:none; opacity:.8;}
+  .nav-item.active .nav-icon{opacity:1;}
+  .nav-item-main span{white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0;}
+  .nav-item .tag{
+    flex:none;
+    font-size:10px; font-weight:700; padding:2px 7px; border-radius:999px;
+    background:var(--chrome-overlay); color:var(--chrome-text-soft);
+  }
+  .nav-item.active .tag{background:var(--accent); color:var(--accent-ink);}
+  .nav-sep{height:1px; background:var(--chrome-line); margin:12px 10px;}
+
+  .content{
+    flex:1; min-width:0; overflow-y:auto;
+    background:var(--paper);
+    padding:26px max(28px,16px) 40px;
+  }
+  .content-header{display:flex; align-items:flex-start; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:18px;}
+  .content-header h1{font-size:21px; font-weight:800;}
+  .content-header p{margin:4px 0 0; font-size:13px; color:var(--text-soft); font-weight:500; max-width:52ch;}
+
+  .tabs{position:relative; display:flex; gap:4px; margin-bottom:14px; flex-wrap:wrap;}
+  .tab-thumb{
+    position:absolute; top:0; height:100%; left:0; width:0; opacity:0;
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-s); box-shadow:var(--shadow-card);
+    transition:left .22s cubic-bezier(.4,0,.2,1), width .22s cubic-bezier(.4,0,.2,1), opacity .15s ease;
+    z-index:0; pointer-events:none;
+  }
+  .tab{
+    position:relative; z-index:1;
+    padding:8px 14px; border-radius:var(--radius-s); border:1px solid transparent;
+    background:none; font-size:13px; font-weight:600; color:var(--text-soft); cursor:pointer;
+    transition:color .2s ease;
+  }
+  .tab.active{color:var(--text);}
+  .tab .count{font-variant-numeric:tabular-nums;}
+
+  .toolbar{display:flex; align-items:center; gap:10px; margin-bottom:16px; flex-wrap:wrap;}
+  .search{
+    display:flex; align-items:center; gap:8px;
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-s);
+    padding:9px 12px; width:100%; max-width:340px;
+  }
+  .search input{border:none; outline:none; font:inherit; font-size:13px; width:100%; background:none; color:var(--text);}
+  .search input::placeholder{color:var(--text-soft);}
+  .search svg{flex:none; opacity:.55;}
+
+  .table-wrap{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-m);
+    box-shadow:var(--shadow-card); overflow:hidden;
+  }
+  .table-scroll{overflow-x:auto;}
+
+  .dashboard-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:14px; margin-bottom:16px;}
+  .stat-card{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-m);
+    box-shadow:var(--shadow-card); padding:18px 20px; display:flex; flex-direction:column; gap:12px;
+    text-align:left; cursor:pointer; font:inherit; transition:border-color .15s ease, transform .15s ease;
+  }
+  .stat-card:hover{border-color:var(--accent); transform:translateY(-1px);}
+  .stat-icon{
+    width:36px; height:36px; border-radius:10px; flex:none;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--accent-soft); color:var(--accent-2-text);
+  }
+  .stat-icon.tone-good{background:var(--good-soft); color:var(--good-text);}
+  .stat-icon.tone-bad{background:var(--bad-soft); color:var(--bad-text);}
+  .stat-value{font-size:26px; font-weight:800; color:var(--text); line-height:1;}
+  .stat-label{font-size:12.5px; font-weight:600; color:var(--text-soft);}
+
+  .dashboard-activity{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-m);
+    box-shadow:var(--shadow-card); padding:18px 20px;
+  }
+  .dashboard-activity-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;}
+  .dashboard-activity-head h2{font-size:14px; margin:0;}
+  .dashboard-view-all{background:none; border:none; font:inherit; font-size:12.5px; font-weight:700; color:var(--accent-2-text); cursor:pointer; padding:4px;}
+  .dashboard-view-all:hover{text-decoration:underline;}
+  .dashboard-activity-row{display:flex; align-items:center; gap:12px; padding:11px 0; border-bottom:1px solid var(--line); flex-wrap:wrap;}
+  .dashboard-activity-row:last-child{border-bottom:none;}
+  .dashboard-activity-desc{flex:1; min-width:160px; font-size:13px; font-weight:500; color:var(--text);}
+
+  /* ---------- DASHBOARD METRICS ---------- */
+  .dash-filters{display:flex; align-items:center; gap:10px; margin-bottom:16px; flex-wrap:wrap;}
+  .dash-filters .tabs{margin-bottom:0;}
+  .dash-filters .tab.active{background:var(--surface-2); border-color:var(--line);}
+
+  .kpi-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(165px,1fr)); gap:12px; margin-bottom:14px;}
+  .kpi{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-m);
+    box-shadow:var(--shadow-card); padding:16px 18px; display:flex; flex-direction:column; gap:6px; min-width:0;
+  }
+  .kpi-label{font-size:12px; font-weight:600; color:var(--text-soft);}
+  .kpi-value{font-size:26px; font-weight:800; letter-spacing:-.01em; color:var(--text); line-height:1.1;}
+  .kpi.hero .kpi-value{font-size:40px;}
+  .kpi.hero{grid-column:span 2;}
+  .kpi-sub{font-size:12px; color:var(--text-soft); font-weight:500; display:flex; gap:6px; align-items:center; flex-wrap:wrap;}
+  .delta{font-weight:700; display:inline-flex; align-items:center; gap:2px;}
+  .delta.up{color:var(--good-text);}
+  .delta.down{color:var(--bad-text);}
+
+  .chart-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-bottom:16px;}
+  .chart-grid .wide{grid-column:1 / -1;}
+  .card{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-m);
+    box-shadow:var(--shadow-card); padding:16px 18px 12px; min-width:0; display:flex; flex-direction:column; gap:10px;
+  }
+  .card-head{display:flex; align-items:flex-start; justify-content:space-between; gap:12px;}
+  .card-title{font-size:14px; font-weight:800; color:var(--text);}
+  .card-sub{font-size:12px; color:var(--text-soft); font-weight:500; margin-top:2px;}
+  .view-toggle{
+    flex:none; background:none; border:1px solid var(--line); color:var(--text-soft);
+    font-size:11.5px; font-weight:700; padding:5px 10px; border-radius:999px; cursor:pointer;
+  }
+  .view-toggle:hover{color:var(--text); border-color:var(--text-soft);}
+  .chart-box{width:100%; height:260px;}
+  .chart-box.tall{height:300px;}
+  .viz-svg{width:100%; height:100%; display:block; overflow:visible;}
+  .viz-svg text{font-family:inherit; font-weight:600;}
+  .legend{display:flex; gap:14px; flex-wrap:wrap; font-size:12px; font-weight:600; color:var(--text-soft);}
+  .legend-item{display:inline-flex; align-items:center; gap:6px;}
+  .legend-swatch{width:10px; height:10px; border-radius:3px; flex:none;}
+
+  .ranked-bars{display:flex; flex-direction:column; gap:9px; padding-top:2px;}
+  .ranked-row{display:grid; grid-template-columns:118px 1fr 32px; align-items:center; gap:10px; font-size:12px;}
+  .ranked-label{color:var(--text-soft); font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .ranked-track{background:var(--surface-2); border-radius:6px; height:10px; overflow:hidden;}
+  .ranked-fill{height:100%; border-radius:6px;}
+  .ranked-count{text-align:right; font-weight:700; color:var(--text); font-variant-numeric:tabular-nums;}
+
+  .mini-table{width:100%; border-collapse:collapse; min-width:0; font-size:12.5px;}
+  .mini-table th{font-size:10.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--text-soft); text-align:left; padding:6px 8px; border-bottom:1px solid var(--line); background:none;}
+  .mini-table td{padding:6px 8px; border-bottom:1px solid var(--line); font-variant-numeric:tabular-nums;}
+  .mini-table td.num, .mini-table th.num{text-align:right;}
+  .mini-table-wrap{max-height:260px; overflow:auto;}
+
+  .viz-tooltip{
+    position:fixed; z-index:200; pointer-events:none;
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-s);
+    box-shadow:0 12px 28px -12px rgba(0,0,0,0.55); padding:9px 11px; min-width:120px; max-width:220px;
+    font-size:12px; color:var(--text);
+  }
+  .viz-tooltip .tt-title{font-size:11px; font-weight:700; color:var(--text-soft); margin-bottom:5px;}
+  .viz-tooltip .tt-row{display:flex; align-items:center; gap:8px; padding:1px 0;}
+  .viz-tooltip .tt-key{width:12px; height:3px; border-radius:2px; flex:none;}
+  .viz-tooltip .tt-val{font-weight:800; font-variant-numeric:tabular-nums;}
+  .viz-tooltip .tt-name{color:var(--text-soft); font-weight:600;}
+  .viz-hit{cursor:pointer;}
+  circle.viz-hit:hover{fill:var(--accent);}
+  .chart-box rect.viz-hit:hover{fill:var(--row-hover);}
+  .viz-area-marker, .viz-area-guide{pointer-events:none;}
+  .viz-area-guide{stroke:var(--text-soft); stroke-width:1; stroke-dasharray:3 3;}
+
+  @keyframes intro-pop{
+    from{transform:translateY(14px);}
+    to{transform:translateY(0);}
+  }
+  .intro-pop{animation:intro-pop .5s cubic-bezier(.34,1.56,.64,1) both;}
+  .ranked-row{cursor:default; border-radius:6px; padding:2px 4px; margin:-2px -4px;}
+  .ranked-row:hover{background:var(--row-hover);}
+
+  @media (max-width:980px){
+    .chart-grid{grid-template-columns:1fr;}
+  }
+  @media (max-width:760px){
+    .kpi-grid{grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px;}
+    .kpi.hero{grid-column:1 / -1;}
+    .kpi.hero .kpi-value{font-size:30px;}
+    .kpi{padding:14px;}
+    .kpi-value{font-size:22px;}
+    .kpi-sub{font-size:11.5px;}
+    .card{padding:14px 14px 10px;}
+    .chart-box{height:220px;}
+    .chart-box.tall{height:240px;}
+    .legend{gap:10px; font-size:11.5px;}
+    .mini-table{display:table;}
+    .mini-table thead{display:table-header-group;}
+    .mini-table tbody{display:table-row-group;}
+    .mini-table tr{display:table-row;}
+    .mini-table td{display:table-cell !important; text-align:left; padding:6px 8px !important;}
+    .mini-table td::before{content:none !important;}
+  }
+
+  table{width:100%; border-collapse:collapse; min-width:760px;}
+  thead th{
+    text-align:left; font-size:10.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase;
+    color:var(--text-soft); padding:12px 16px; border-bottom:1px solid var(--line); background:var(--surface-2);
+    white-space:nowrap;
+  }
+  tbody td{padding:13px 16px; border-bottom:1px solid var(--line); font-size:13.5px; vertical-align:middle;}
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr.data-row{cursor:pointer;}
+  tbody tr.data-row:hover td{background:var(--row-hover);}
+  .cell-name{font-weight:700;}
+  .cell-sub{color:var(--text-soft); font-weight:500; font-size:12px; margin-top:1px;}
+  .cell-body{color:var(--text); font-weight:500; font-size:13px; line-height:1.5; max-width:420px;}
+  .chip{
+    display:inline-flex; align-items:center; gap:5px; font-size:11.5px; font-weight:700;
+    padding:3px 10px; border-radius:999px; white-space:nowrap;
+  }
+  .chip.good{background:var(--good-soft); color:var(--good-text);}
+  .chip.bad{background:var(--bad-soft); color:var(--bad-text);}
+  .chip.neutral{background:var(--accent-soft); color:var(--accent-2-text);}
+  .row-actions{display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
+  .role-select{
+    display:inline-flex; align-items:center; gap:8px;
+    font:inherit; font-size:12px; font-weight:700;
+    padding:8px 12px 8px 14px; max-width:210px;
+    border:1px solid transparent; border-radius:999px;
+    color:var(--accent-2-text); background-color:var(--accent-soft);
+    cursor:pointer;
+    transition:border-color .15s ease, background-color .15s ease;
+  }
+  .role-select svg{flex:none; opacity:.85; transition:transform .15s ease;}
+  .role-select:hover{border-color:var(--accent);}
+  .role-select[aria-expanded="true"] svg{transform:rotate(180deg);}
+  .role-select:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+
+  .role-menu{
+    position:fixed; z-index:60;
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-m);
+    box-shadow:0 16px 36px -14px rgba(0,0,0,0.55);
+    padding:6px; min-width:190px; max-width:calc(100vw - 32px);
+    max-height:min(280px, calc(100vh - 32px)); overflow-y:auto;
+    display:flex; flex-direction:column; gap:2px;
+  }
+  .role-option{
+    background:none; border:none; text-align:left; cursor:pointer;
+    padding:8px 10px; border-radius:var(--radius-s);
+    font:inherit; font-size:12.5px; font-weight:600; color:var(--text);
+  }
+  .role-option:hover{background:rgba(255,106,0,0.12); color:var(--accent-2-text);}
+  .role-option.selected{background:var(--accent); color:var(--accent-ink);}
+  .role-option-static{cursor:default; color:var(--text-soft);}
+  .role-option-static:hover{background:none; color:var(--text-soft);}
+  .btn-approve{
+    background:var(--good); color:var(--accent-ink); border:none; font-size:12px; font-weight:700;
+    padding:7px 13px; border-radius:var(--radius-s); cursor:pointer;
+  }
+  .btn-approve:hover{filter:brightness(1.06);}
+  .btn-reject{
+    background:none; color:var(--text-soft); border:1px solid var(--line); font-size:12px; font-weight:700;
+    padding:7px 13px; border-radius:var(--radius-s); cursor:pointer;
+  }
+  .btn-reject:hover{border-color:var(--bad); color:var(--bad-text);}
+  .dash{color:var(--text-soft);}
+
+  .detail-row td{background:var(--ink-2); padding:0; border-bottom:1px solid var(--line);}
+  .detail-inner{padding:14px 20px 18px 44px; display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:12px 24px;}
+  .detail-field{display:flex; flex-direction:column; gap:2px;}
+  .detail-field.full{grid-column:1/-1;}
+  .detail-field .k{font-size:10px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--text-soft);}
+  .detail-field .v{font-size:13px; font-weight:600; color:var(--text);}
+  .detail-field.full .v{font-weight:500; line-height:1.55;}
+
+  .cell-item{display:flex; align-items:center; gap:12px;}
+  .item-thumb{
+    width:40px; height:40px; border-radius:10px; flex:none;
+    background:var(--accent-soft); color:var(--accent-2-text);
+    display:flex; align-items:center; justify-content:center;
+  }
+
+  .reject-panel{padding:14px 20px 18px 44px; border-top:1px dashed var(--line); display:flex; flex-direction:column; gap:10px;}
+  .reject-panel label{font-size:11px; font-weight:700; color:var(--text-soft); text-transform:uppercase; letter-spacing:.05em;}
+  .reject-panel textarea{
+    font:inherit; font-size:13px; padding:9px 11px; border:1px solid var(--line); border-radius:var(--radius-s);
+    resize:vertical; min-height:56px; color:var(--text); background:var(--paper);
+  }
+  .reject-panel textarea::placeholder{color:var(--text-soft);}
+  .reject-panel .actions{display:flex; gap:8px;}
+  .btn-confirm-reject{background:var(--bad); color:var(--accent-ink); border:none; font-size:12px; font-weight:700; padding:7px 14px; border-radius:var(--radius-s); cursor:pointer;}
+  .btn-cancel{background:none; border:1px solid var(--line); color:var(--text-soft); font-size:12px; font-weight:700; padding:7px 14px; border-radius:var(--radius-s); cursor:pointer;}
+
+  .code-line{display:flex; align-items:center; gap:6px; font-weight:700; font-size:12.5px; color:var(--text); font-variant-numeric:tabular-nums;}
+  .code-line .dot{width:5px; height:5px; border-radius:50%; background:var(--good);}
+
+  .empty-state{padding:48px 20px; text-align:center; color:var(--text-soft); font-size:13px; font-weight:500;}
+
+  .toast-stack{
+    position:fixed; right:16px; bottom:calc(16px + env(safe-area-inset-bottom,0px)); z-index:50;
+    display:flex; flex-direction:column; gap:8px; align-items:flex-end;
+  }
+  .toast{
+    background:var(--ink); color:#fff; font-size:12.5px; font-weight:600;
+    padding:11px 16px; border-radius:var(--radius-s); box-shadow:0 12px 30px -10px rgba(0,0,0,0.45);
+    max-width:300px; opacity:0; transform:translateY(6px); transition:opacity .25s ease, transform .25s ease;
+  }
+  .toast.show{opacity:1; transform:translateY(0);}
+
+  .modal-overlay{
+    position:fixed; inset:0; z-index:70;
+    background:rgba(0,0,0,0.55);
+    display:flex; align-items:center; justify-content:center;
+    padding:16px;
+  }
+  .modal-card{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-l);
+    box-shadow:0 30px 60px -20px rgba(0,0,0,0.55);
+    padding:24px; max-width:340px; width:100%;
+    display:flex; flex-direction:column; gap:14px;
+  }
+  .modal-card h3{font-size:16px; font-weight:800; color:var(--text);}
+  .modal-card p{font-size:13px; color:var(--text-soft); font-weight:500; line-height:1.5;}
+  .modal-actions{display:flex; gap:8px; justify-content:flex-end;}
+  .btn-logout-confirm{
+    display:inline-flex; align-items:center; gap:7px;
+    background:var(--accent); color:var(--accent-ink); border:none; font-size:12px; font-weight:700;
+    padding:8px 16px; border-radius:var(--radius-s); cursor:pointer;
+  }
+  .btn-logout-confirm:hover{filter:brightness(1.06);}
+
+  .app-clock{
+    display:flex; align-items:center; gap:7px; flex:none;
+    background:none; border:1px solid var(--chrome-line); color:var(--chrome-text-soft);
+    font-size:12px; font-weight:700; font-variant-numeric:tabular-nums;
+    padding:6px 12px; border-radius:999px;
+  }
+  .app-clock .clock-face{flex:none; color:var(--chrome-text-soft);}
+  .app-clock .clock-sep{opacity:.4;}
+
+  .btn-add{
+    background:var(--accent); color:var(--accent-ink); border:none; font-size:12.5px; font-weight:700;
+    padding:9px 15px; border-radius:var(--radius-s); cursor:pointer; flex:none;
+  }
+  .btn-add:hover{filter:brightness(1.06);}
+
+  @keyframes add-panel-in{
+    from{opacity:0; transform:translateY(-8px) scaleY(.96);}
+    to{opacity:1; transform:translateY(0) scaleY(1);}
+  }
+  .add-panel{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-m);
+    box-shadow:var(--shadow-card); padding:16px 18px; margin-bottom:16px;
+    display:flex; flex-direction:column; gap:10px;
+    transform-origin:top;
+    animation:add-panel-in .2s cubic-bezier(.34,1.56,.64,1);
+  }
+  .add-panel .fields{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px;}
+  .add-panel label{font-size:11px; font-weight:700; color:var(--text-soft); text-transform:uppercase; letter-spacing:.05em; display:flex; flex-direction:column; gap:5px;}
+  .add-panel input, .add-panel textarea{
+    font:inherit; font-size:13px; padding:9px 11px; border:1px solid var(--line); border-radius:var(--radius-s);
+    color:var(--text); background:var(--paper); text-transform:none; letter-spacing:normal; font-weight:500;
+  }
+  .add-panel textarea{resize:vertical; min-height:56px;}
+  .add-panel .actions{display:flex; gap:8px;}
+  .btn-save{background:var(--good); color:var(--accent-ink); border:none; font-size:12px; font-weight:700; padding:7px 14px; border-radius:var(--radius-s); cursor:pointer;}
+
+  .btn-activate{background:var(--accent); color:var(--accent-ink); border:none; font-size:12px; font-weight:700; padding:7px 13px; border-radius:var(--radius-s); cursor:pointer;}
+  .btn-activate:hover{filter:brightness(1.06);}
+  .btn-delete{background:none; color:var(--text-soft); border:1px solid var(--line); font-size:12px; font-weight:700; padding:7px 13px; border-radius:var(--radius-s); cursor:pointer;}
+  .btn-delete:hover{border-color:var(--bad); color:var(--bad-text);}
+
+  /* Expanded profile / participants detail */
+  .profile-detail{padding:14px 20px 18px 44px; display:flex; flex-direction:column; gap:16px;}
+  .detail-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:12px 24px;}
+  .detail-section-title{font-size:10px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--text-soft); margin-bottom:8px;}
+  .garage-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:10px;}
+  .garage-card{display:flex; align-items:center; gap:12px; background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-m); padding:10px 12px;}
+  .garage-name{font-size:13px; font-weight:700; color:var(--text);}
+  .garage-plate{font-size:12px; font-weight:700; color:var(--accent-2-text); font-variant-numeric:tabular-nums;}
+  .garage-empty{font-size:12.5px; font-weight:500; color:var(--text-soft);}
+  .people-list{display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:8px;}
+  .person{display:flex; align-items:center; gap:10px; background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-m); padding:8px 12px;}
+  .person-main{flex:1; min-width:0;}
+  .person-main .cell-name, .person-main .cell-sub{white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .avatar{width:32px; height:32px; border-radius:50%; flex:none; display:flex; align-items:center; justify-content:center; background:var(--series-1); color:#fff; font-size:13px; font-weight:800;}
+  .chip.lead{background:none; box-shadow:inset 0 0 0 1px var(--accent); color:var(--accent-2-text);}
+  .chip.plain{background:none; box-shadow:inset 0 0 0 1px var(--line); color:var(--text-soft);}
+  .people-more{font-size:12px; font-weight:600; color:var(--text-soft); margin-top:8px;}
+
+  /* Dashboard riding stats */
+  .chart-box.auto{height:auto;}
+  .ride-stats{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin-bottom:14px;}
+  .ride-stat{background:var(--surface-2); border-radius:var(--radius-s); padding:10px 12px;}
+  .ride-stat .k{font-size:10px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--accent-2-text);}
+  .ride-stat .v{font-size:18px; font-weight:800; color:var(--text); font-variant-numeric:tabular-nums; margin-top:2px;}
+  .ranked-bars.wide-count .ranked-row{grid-template-columns:118px 1fr 72px;}
+
+  @media (max-width:760px){
+    .profile-detail{padding-left:20px; padding-right:16px;}
+    .ride-stats{grid-template-columns:1fr;}
+  }
+
+  @media (max-width:760px){
+    .menu-toggle{display:inline-flex;}
+
+    .sidebar{
+      position:fixed; top:0; bottom:0; left:0; z-index:40;
+      width:min(78vw,300px); flex-direction:column; gap:2px;
+      overflow-y:auto; -webkit-overflow-scrolling:touch;
+      border-right:1px solid var(--chrome-line); border-bottom:none;
+      padding:16px 12px calc(16px + env(safe-area-inset-bottom,0px));
+      padding-top:calc(16px + env(safe-area-inset-top,0px));
+      transform:translateX(-100%);
+      transition:transform .22s ease;
+      box-shadow:24px 0 48px -24px rgba(0,0,0,0.6);
+    }
+    .sidebar.open{transform:translateX(0);}
+    .nav-item{padding:10px 12px;}
+
+    .sidebar-overlay{display:block;}
+
+    .shell-body{flex-direction:column;}
+    .account-email{display:none;}
+    .app-clock{padding:6px 9px;}
+    .app-clock #clock-date, .app-clock .clock-sep, .app-clock #clock-seconds{display:none;}
+    .content{padding:18px 14px 32px;}
+
+    .content-header{flex-direction:column; align-items:stretch;}
+    .content-header h1{font-size:18px;}
+    .btn-add{width:100%;}
+
+    .search{max-width:none;}
+
+    .add-panel .fields{grid-template-columns:1fr;}
+
+    /* Tables become stacked cards instead of scrolling sideways */
+    .table-scroll{overflow-x:visible;}
+    table{min-width:0; display:block;}
+    thead{display:none;}
+    tbody{display:block;}
+    tbody tr{display:block; border-bottom:1px solid var(--line);}
+    tbody tr:last-child{border-bottom:none;}
+    tbody td{border-bottom:none;}
+
+    tbody tr td:not([colspan]){
+      display:flex; justify-content:space-between; align-items:flex-start; gap:14px;
+      padding:6px 16px; text-align:right;
+    }
+    tbody tr td:not([colspan])::before{
+      content:attr(data-label); flex:none; text-align:left; padding-top:1px;
+      font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--text-soft);
+    }
+    tbody tr td:not([colspan]):first-child{
+      display:block; text-align:left; padding:12px 16px 8px;
+      border-bottom:1px dashed var(--line); margin-bottom:2px;
+    }
+    tbody tr td:not([colspan]):first-child::before{content:none;}
+    tbody tr td:not([colspan]):last-child{padding-bottom:12px;}
+    tbody tr td[colspan]{padding:0;}
+    tbody tr td.cell-body{max-width:none;}
+
+    .row-actions{justify-content:flex-end; flex-wrap:wrap;}
+    .detail-inner, .reject-panel{padding-left:20px; padding-right:16px;}
+
+    .btn-approve, .btn-reject, .btn-activate, .btn-delete,
+    .btn-confirm-reject, .btn-cancel, .btn-save{padding:9px 14px; font-size:12.5px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="view" id="view-login">
+  <div class="login-slideshow" id="login-slideshow">
+    <div class="login-slide active" style="background-image:url('assets/login-1.jpg')"></div>
+    <div class="login-slide" style="background-image:url('assets/login-2.jpg')"></div>
+    <div class="login-slide" style="background-image:url('assets/login-3.jpg')"></div>
+    <div class="login-slide" style="background-image:url('assets/login-4.jpg')"></div>
+  </div>
+  <div class="login-scrim"></div>
+  <div class="login-card">
+    <div class="login-emblem"><img src="assets/logo.png" alt="Royal Riders Indonesia Jakarta emblem"></div>
+    <div class="lockup">
+      <div class="word">ROJAK <span>ADMIN</span></div>
+      <div class="sub" data-i18n="loginSub">Member verification for Royal Riders Indonesia&nbsp;Jakarta</div>
+    </div>
+    <button class="btn-google" id="btn-signin" type="button">
+      <svg class="g-mark" viewBox="0 0 18 18" aria-hidden="true">
+        <path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.9c1.7-1.57 2.7-3.88 2.7-6.62z"/>
+        <path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.9-2.26c-.8.54-1.84.86-3.06.86-2.35 0-4.34-1.59-5.05-3.72H.98v2.33A9 9 0 0 0 9 18z"/>
+        <path fill="#FBBC05" d="M3.95 10.7A5.4 5.4 0 0 1 3.67 9c0-.59.1-1.17.28-1.7V4.97H.98A9 9 0 0 0 0 9c0 1.45.35 2.83.98 4.03l2.97-2.33z"/>
+        <path fill="#EA4335" d="M9 3.58c1.32 0 2.5.46 3.44 1.35l2.58-2.58C13.46.89 11.43 0 9 0A9 9 0 0 0 .98 4.97L3.95 7.3C4.66 5.17 6.65 3.58 9 3.58z"/>
+      </svg>
+      <span id="signin-label" data-i18n="signIn">Sign in with Google</span>
+    </button>
+    <p class="login-note" data-i18n="loginNote">Access is restricted to authorized Rojak admins. If you believe this is a mistake, contact a core team member.</p>
+  </div>
+</div>
+
+<div class="view" id="view-app" hidden>
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="menu-toggle" id="btn-menu" type="button" aria-label="Open menu">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+      </button>
+      <div class="brand">
+      <div class="brand-mark"><img src="assets/logo.png" alt=""></div>
+      <div class="brand-word">ROJAK <span>ADMIN</span></div>
+      </div>
+    </div>
+    <div class="topbar-right">
+    <div class="app-clock" id="app-clock">
+      <svg class="clock-face" width="15" height="15" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="10.5" stroke="currentColor" stroke-width="1.6"/>
+        <line id="clock-hour" x1="12" y1="12" x2="12" y2="7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        <line id="clock-minute" x1="12" y1="12" x2="12" y2="5.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+        <line id="clock-second" x1="12" y1="12" x2="12" y2="4.5" stroke="var(--good)" stroke-width="1" stroke-linecap="round"/>
+      </svg>
+      <span id="clock-date">--</span>
+      <span class="clock-sep">&middot;</span>
+      <span id="clock-time">--:--</span><span id="clock-seconds">:--</span>
+    </div>
+    <div class="account">
+      <button class="account-trigger" id="btn-account" type="button" aria-expanded="false" aria-haspopup="true">
+        <div class="avatar">M</div>
+        <span class="account-email">marshall@rojak.id</span>
+        <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="account-menu" id="account-menu" hidden>
+        <div class="account-menu-name">Marshall Adiwijaya</div>
+        <div class="account-menu-email">marshall@rojak.id</div>
+        <span class="role-badge" data-i18n="roleBadge">Core Team Admin</span>
+        <div class="account-menu-sep"></div>
+        <div class="lang-switch" id="lang-switch">
+          <div class="switch-thumb pos-1" id="lang-thumb"></div>
+          <button class="lang-btn" type="button" data-lang="en">EN</button>
+          <button class="lang-btn active" type="button" data-lang="id">ID</button>
+        </div>
+        <div class="theme-switch" id="theme-switch">
+          <div class="switch-thumb" id="theme-thumb"></div>
+          <button class="theme-btn active" type="button" data-theme-value="dark" data-i18n="themeDark">Dark</button>
+          <button class="theme-btn" type="button" data-theme-value="light" data-i18n="themeLight">Light</button>
+        </div>
+        <div class="account-menu-sep"></div>
+        <button class="logout-btn" id="btn-logout" type="button">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          <span data-i18n="logOut">Log out</span>
+        </button>
+      </div>
+    </div>
+    </div>
+  </header>
+
+  <div class="shell-body">
+    <nav class="sidebar">
+      <div class="nav-thumb" id="nav-thumb"></div>
+      <button class="nav-item active" type="button" data-section="dashboard">
+        <span class="nav-item-main">
+          <svg class="nav-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+          <span data-i18n="navDashboard">Dashboard</span>
+        </span>
+      </button>
+      <div class="nav-sep"></div>
+      <div class="nav-label" data-i18n="navGroupMembers">Members</div>
+      <button class="nav-item" type="button" data-section="members">
+        <span class="nav-item-main">
+          <svg class="nav-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><polyline points="17 11 19 13 23 9"/></svg>
+          <span data-i18n="navMemberReview">Member Review</span>
+        </span>
+        <span class="tag" id="pending-tag">0</span>
+      </button>
+      <button class="nav-item" type="button" data-section="directory">
+        <span class="nav-item-main">
+          <svg class="nav-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span data-i18n="navMemberDirectory">Member Directory</span>
+        </span>
+      </button>
+      <button class="nav-item" type="button" data-section="qris">
+        <span class="nav-item-main">
+          <svg class="nav-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><line x1="14" y1="14" x2="21" y2="14"/><line x1="14" y1="21" x2="21" y2="21"/><line x1="17.5" y1="14" x2="17.5" y2="21"/></svg>
+          <span data-i18n="navQris">QRIS Monitoring</span>
+        </span>
+        <span class="tag" id="qris-tag">0</span>
+      </button>
+      <div class="nav-sep"></div>
+      <div class="nav-label" data-i18n="navGroupCommunity">Community</div>
+      <button class="nav-item" type="button" data-section="announcements">
+        <span class="nav-item-main">
+          <svg class="nav-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-5v12L3 13v-2z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>
+          <span data-i18n="navAnnouncements">Announcements</span>
+        </span>
+      </button>
+      <button class="nav-item" type="button" data-section="agenda">
+        <span class="nav-item-main">
+          <svg class="nav-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span data-i18n="navAgenda">Agenda</span>
+        </span>
+      </button>
+      <button class="nav-item" type="button" data-section="touring">
+        <span class="nav-item-main">
+          <svg class="nav-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+          <span data-i18n="navTouring">Touring Routes</span>
+        </span>
+      </button>
+      <button class="nav-item" type="button" data-section="merchandise">
+        <span class="nav-item-main">
+          <svg class="nav-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          <span data-i18n="navMerch">Merchandise</span>
+        </span>
+        <span class="tag" id="merch-tag">0</span>
+      </button>
+      <div class="nav-sep"></div>
+      <div class="nav-label" data-i18n="navGroupSystem">System</div>
+      <button class="nav-item" type="button" data-section="lora">
+        <span class="nav-item-main">
+          <svg class="nav-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+          <span data-i18n="navLora">LoRa Devices</span>
+        </span>
+        <span class="tag" id="lora-tag">0</span>
+      </button>
+      <button class="nav-item" type="button" data-section="auditlog">
+        <span class="nav-item-main">
+          <svg class="nav-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2h6a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"/><path d="M9 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-3"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="16" y2="15"/></svg>
+          <span data-i18n="navAuditLog">Audit Log</span>
+        </span>
+      </button>
+    </nav>
+
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <main class="content">
+      <div class="content-header" id="content-header"></div>
+
+      <div class="tabs" id="tabs"><div class="tab-thumb" id="tab-thumb"></div></div>
+
+      <div class="toolbar" id="toolbar">
+        <label class="search">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="search" placeholder="Search..." data-i18n-placeholder="searchPlaceholder">
+        </label>
+      </div>
+
+      <div id="add-panel"></div>
+
+      <div id="dashboard-view" hidden></div>
+
+      <div class="table-wrap" id="table-wrap">
+        <div class="table-scroll">
+          <table>
+            <thead id="thead"></thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<div class="role-menu" id="role-menu-portal" hidden></div>
+<div class="role-menu" id="match-menu-portal" hidden></div>
+
+<div class="modal-overlay" id="logout-overlay" hidden>
+  <div class="modal-card">
+    <h3 data-i18n="logoutConfirmTitle">Log out?</h3>
+    <p data-i18n="logoutConfirmBody">You'll need to sign in again to access the admin panel.</p>
+    <div class="modal-actions">
+      <button class="btn-cancel" id="btn-logout-cancel" type="button" data-i18n="btnCancel">Cancel</button>
+      <button class="btn-logout-confirm" id="btn-logout-confirm" type="button">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        <span data-i18n="logOut">Log out</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-stack" id="toast-stack"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  var TODAY = "22 Sep 2026";
+
+  var members = [
+    // Pending
+    { id:1, name:"Rizky Pratama", moto:"Royal Enfield Meteor 350", community:"Jakarta Selatan", payment:"Paid", status:"pending",
+      phone:"+62 812-3456-7890", submitted:"18 Sep 2026", plate:"B 4521 RJK", coc:true },
+    { id:2, name:"Dewi Anggraini", moto:"Royal Enfield Classic 350", community:"Jakarta Barat", payment:"Paid", status:"pending",
+      phone:"+62 813-2290-1144", submitted:"19 Sep 2026", plate:"B 2290 RJK", coc:true },
+    { id:3, name:"Bagas Wirawan", moto:"Royal Enfield Hunter 350", community:"Bekasi", payment:"Unpaid", status:"pending",
+      phone:"+62 857-7712-0033", submitted:"19 Sep 2026", plate:"B 7712 RJK", coc:true },
+    { id:4, name:"Siti Nurhaliza", moto:"Royal Enfield Interceptor 650", community:"Tangerang", payment:"Paid", status:"pending",
+      phone:"+62 878-4420-5567", submitted:"20 Sep 2026", plate:"B 4420 RJK", coc:true },
+    { id:5, name:"Andra Saputra", moto:"Royal Enfield Himalayan 450", community:"Depok", payment:"Paid", status:"pending",
+      phone:"+62 815-9931-2287", submitted:"20 Sep 2026", plate:"B 9931 RJK", coc:true },
+    { id:6, name:"Made Wirawan", moto:"Royal Enfield Continental GT 650", community:"Jakarta Timur", payment:"Unpaid", status:"pending",
+      phone:"+62 821-6604-3312", submitted:"21 Sep 2026", plate:"B 6604 RJK", coc:true },
+    // Approved
+    { id:7, name:"Nadia Kusuma", moto:"Royal Enfield Meteor 350", community:"Jakarta Utara", payment:"Paid", status:"approved",
+      code:"RJK-7F3K2", decidedOn:"15 Sep 2026", role:"Ketua Komunitas",
+      email:"nadia.kusuma@mail.com", phone:"+62 812-7781-2201", location:"Jakarta Utara", birthDate:"1994-06-11", job:"Karyawan Swasta",
+      garage:{ motors:[{ name:"Royal Enfield Meteor 350", plate:"B 3318 NDK", color:"Stellar Blue" }],
+               helmets:[{ name:"KYT TT-Course", size:"M" }] },
+      stats:{ km:1240, minutes:1935, tours:14 } },
+    { id:8, name:"Teguh Santoso", moto:"Royal Enfield Classic 350", community:"Jakarta Pusat", payment:"Paid", status:"approved",
+      code:"RJK-9M1B7", decidedOn:"16 Sep 2026", role:"Bendahara",
+      email:"teguh.santoso@mail.com", phone:"+62 813-5520-8874", location:"Jakarta Pusat", birthDate:"1988-01-23", job:"Wiraswasta",
+      garage:{ motors:[{ name:"Royal Enfield Classic 350", plate:"B 5520 TGH", color:"Halcyon Green" },
+                       { name:"Royal Enfield Himalayan 450", plate:"B 1207 TGH", color:"Kaza Brown" }],
+               helmets:[] },
+      stats:{ km:1105, minutes:1760, tours:12 } },
+    { id:9, name:"Putri Ramadhani", moto:"Royal Enfield Scram 411", community:"Bogor", payment:"Paid", status:"approved",
+      code:"RJK-2Q8L4", decidedOn:"17 Sep 2026", role:"Sekretaris",
+      email:"putri.ramadhani@mail.com", phone:"+62 857-2210-9936", location:"Bogor", birthDate:"2001-09-04", job:"Pelajar/Mahasiswa",
+      garage:{ motors:[{ name:"Royal Enfield Scram 411", plate:"F 2210 PTR", color:"Skyline Blue" }],
+               helmets:[{ name:"NHK GP-R Tech", size:"S" }, { name:"INK Centro Jet", size:"S" }] },
+      stats:{ km:980, minutes:1510, tours:11 } },
+    // Rejected
+    { id:10, name:"Fajar Nugroho", moto:"Royal Enfield Hunter 350", community:"Jakarta Selatan", payment:"Unpaid", status:"rejected",
+      reason:"Payment proof unreadable — please resubmit a clearer photo.", decidedOn:"14 Sep 2026" },
+    { id:11, name:"Yoga Pratama", moto:"Royal Enfield Meteor 350", community:"Bekasi", payment:"Paid", status:"rejected",
+      reason:"Community affiliation could not be verified.", decidedOn:"15 Sep 2026" }
+  ];
+
+  var announcements = [
+    { id:1, title:"Touring Bandung — 12 Okt 2026", body:"Kumpul di SPBU Pasteur jam 06.00. Wajib bawa jas hujan dan STNK asli.", postedOn:"18 Sep 2026", time:"19:30" },
+    { id:2, title:"Technical Meeting Bulanan", body:"Wajib hadir untuk semua ketua sub-komunitas, membahas persiapan touring Oktober.", postedOn:"15 Sep 2026", time:"09:15" }
+  ];
+
+  var agenda = [
+    { id:1, title:"Touring Bandung", date:"12 Okt 2026", time:"06:00", location:"SPBU Pasteur, Jakarta Barat", note:"Kumpul 06.00, rolling 06.30" },
+    { id:2, title:"Kopdar Bulanan", date:"28 Sep 2026", time:"19:00", location:"Warung Kopi RE, Kemang", note:"Evaluasi kegiatan bulan ini" }
+  ];
+
+  // status: inactive / active = upcoming, completed = finished ride with distance + duration.
+  // participants is a sample of the registered riders; riders is the full count.
+  var touringRoutes = [
+    { id:1, name:"Jakarta – Bandung via Puncak", waypoints:"Jakarta Selatan → Puncak → Cianjur → Bandung", scheduledFor:"12 Okt 2026", time:"06:30", status:"inactive", riders:47,
+      participants:[
+        { name:"Nadia Kusuma", moto:"Meteor 350", color:"Stellar Blue", lead:true },
+        { name:"Teguh Santoso", moto:"Classic 350", color:"Halcyon Green" },
+        { name:"Putri Ramadhani", moto:"Scram 411", color:"Skyline Blue" },
+        { name:"Hendra Gunawan", moto:"Interceptor 650", color:"Black Ray" },
+        { name:"Sari Wulandari", moto:"Hunter 350", color:"Rebel Red" }
+      ] },
+    { id:2, name:"Kopdar Rute Kemang", waypoints:"Titik kumpul → Warung Kopi RE, Kemang", scheduledFor:"28 Sep 2026", time:"19:30", status:"inactive", riders:29,
+      participants:[
+        { name:"Teguh Santoso", moto:"Classic 350", color:"Halcyon Green", lead:true },
+        { name:"Reza Mahendra", moto:"Himalayan 450", color:"Slate Himalayan Salt" },
+        { name:"Nadia Kusuma", moto:"Meteor 350", color:"Stellar Blue" }
+      ] },
+    { id:3, name:"Sunmori Sentul", waypoints:"Senayan → Tol Jagorawi → Sentul Circuit", scheduledFor:"7 Sep 2026", time:"06:00", status:"completed", riders:52,
+      distanceKm:58, durationMin:110,
+      participants:[
+        { name:"Nadia Kusuma", moto:"Meteor 350", color:"Stellar Blue", lead:true },
+        { name:"Hendra Gunawan", moto:"Interceptor 650", color:"Black Ray" },
+        { name:"Putri Ramadhani", moto:"Scram 411", color:"Skyline Blue" },
+        { name:"Reza Mahendra", moto:"Himalayan 450", color:"Slate Himalayan Salt" }
+      ] },
+    { id:4, name:"Jakarta – Anyer Pantai", waypoints:"Jakarta Barat → Tangerang → Serang → Anyer", scheduledFor:"30 Agu 2026", time:"05:30", status:"completed", riders:38,
+      distanceKm:142, durationMin:265,
+      participants:[
+        { name:"Hendra Gunawan", moto:"Interceptor 650", color:"Black Ray", lead:true },
+        { name:"Teguh Santoso", moto:"Classic 350", color:"Halcyon Green" },
+        { name:"Sari Wulandari", moto:"Hunter 350", color:"Rebel Red" }
+      ] }
+  ];
+
+  // Official community merch sold in the app's Merchandise tab. Price in Rupiah.
+  // status: active (live in app) / hidden. Active with stock 0 shows as sold out.
+  var merchandise = [
+    { id:1, name:"Kaos RRI Jakarta — Hitam", category:"Apparel", price:175000, stock:42, sold:118, status:"active", icon:"shirt",
+      desc:"Kaos cotton combed 24s, sablon logo RRI Jakarta di dada dan punggung. Tersedia S–XXL." },
+    { id:2, name:"Jaket Riding RRI Jakarta", category:"Apparel", price:650000, stock:9, sold:37, status:"active", icon:"jacket",
+      desc:"Jaket riding dengan protektor bahu & siku, bordir emblem komunitas. Tersedia M–XXL." },
+    { id:3, name:"Patch Bordir Komunitas", category:"Aksesoris", price:45000, stock:0, sold:210, status:"active", icon:"patch",
+      desc:"Patch bordir resmi untuk rompi dan jaket. Restock berikutnya setelah touring Oktober." },
+    { id:4, name:"Stiker Tangki Reflektif", category:"Aksesoris", price:25000, stock:150, sold:64, status:"active", icon:"default",
+      desc:"Stiker reflektif ukuran 12 cm, tahan air dan panas, cocok untuk tangki atau helm." },
+    { id:5, name:"Topi Trucker RRI", category:"Apparel", price:120000, stock:30, sold:0, status:"hidden", icon:"cap",
+      desc:"Topi trucker bordir logo, strap belakang adjustable. Belum dirilis ke anggota." }
+  ];
+
+  // Orders placed from the app. status: new → processing → shipped → done
+  var merchOrders = [
+    { id:1, orderNo:"ORD-1046", buyer:"Nadia Kusuma", phone:"+62 812-7781-2201", items:"Kaos RRI Jakarta — Hitam (L) ×2", total:350000,
+      placedOn:"22 Sep 2026", shipTo:"Jl. Enggano No. 8, Tanjung Priok, Jakarta Utara", status:"new" },
+    { id:2, orderNo:"ORD-1045", buyer:"Hendra Gunawan", phone:"+62 811-9082-3345", items:"Jaket Riding RRI Jakarta (XL) ×1", total:650000,
+      placedOn:"21 Sep 2026", shipTo:"Jl. Panjang No. 21, Kebon Jeruk, Jakarta Barat", status:"new" },
+    { id:3, orderNo:"ORD-1044", buyer:"Putri Ramadhani", phone:"+62 857-2210-9936", items:"Stiker Tangki Reflektif ×4", total:100000,
+      placedOn:"20 Sep 2026", shipTo:"Jl. Pajajaran No. 57, Bogor Tengah, Bogor", status:"processing" },
+    { id:4, orderNo:"ORD-1043", buyer:"Teguh Santoso", phone:"+62 813-5520-8874", items:"Patch Bordir Komunitas ×3", total:135000,
+      placedOn:"17 Sep 2026", shipTo:"Jl. Cikini Raya No. 40, Menteng, Jakarta Pusat", status:"shipped" },
+    { id:5, orderNo:"ORD-1042", buyer:"Sari Wulandari", phone:"+62 878-6613-2019", items:"Kaos RRI Jakarta — Hitam (M) ×1, Patch Bordir Komunitas ×1", total:220000,
+      placedOn:"14 Sep 2026", shipTo:"Jl. Margonda Raya No. 99, Depok", status:"done" }
+  ];
+
+  var ITEM_ICONS = {
+    shirt:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/></svg>',
+    cap:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15a8 8 0 0 1 16 0"/><path d="M4 15h17a2 2 0 0 1-2 2H4z"/><line x1="12" y1="7" x2="12" y2="5"/></svg>',
+    patch:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5.5" stroke-dasharray="2 2"/></svg>',
+    moto:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="16.5" r="3.5"/><circle cx="18.5" cy="16.5" r="3.5"/><path d="M5.5 16.5 9 10h5l2.5 6.5"/><path d="M14 10l1.5-3H18"/><path d="M9 10 7.5 7H5"/></svg>',
+    helmet:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 15a9 9 0 0 1 18 0v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M12 15h9"/><path d="M12 6v9"/></svg>',
+    jacket:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4l4 2 4-2 3 3-2.5 2.5V20a1 1 0 0 1-1 1H8.5a1 1 0 0 1-1-1V9.5L5 7l3-3z"/><line x1="12" y1="8" x2="12" y2="20"/></svg>',
+    shield:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/></svg>',
+    exhaust:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="10" width="12" height="5" rx="2.5"/><line x1="17" y1="11" x2="20" y2="9"/><line x1="18" y1="13" x2="21" y2="13"/><line x1="17" y1="15" x2="20" y2="17"/></svg>',
+    "default":'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><line x1="12" y1="13" x2="12" y2="21"/></svg>'
+  };
+
+  var loraDevices = [
+    { id:1, deviceId:"LORA-RJK-0F21", model:"Meshtastic T-Beam v1.1", owner:"Rizky Pratama", firmware:"v2.3.1", battery:82, status:"online", lastSeen:"Just now" },
+    { id:2, deviceId:"LORA-RJK-0F22", model:"Heltec V3 Mesh Node", owner:"Teguh Santoso", firmware:"v2.3.1", battery:64, status:"online", lastSeen:"3 min ago" },
+    { id:3, deviceId:"LORA-RJK-0F19", model:"Meshtastic T-Beam v1.1", owner:"Fajar Nugroho", firmware:"v2.2.9", battery:12, status:"offline", lastSeen:"2 days ago" },
+    { id:4, deviceId:"LORA-RJK-0F30", model:"RAK WisBlock RAK4631", owner:"Bagas Wirawan", firmware:"v2.1.4", battery:0, status:"offline", lastSeen:"1 week ago" }
+  ];
+
+  var auditLog = [
+    { id:1, at:"24 Sep 2026, 09:12", admin:"Marshall Adiwijaya", type:"approve", desc:"Approved member application — Rizky Pratama" },
+    { id:2, at:"23 Sep 2026, 18:40", admin:"Marshall Adiwijaya", type:"edit", desc:"Updated role to Koordinator Touring — Bagas Wirawan" },
+    { id:3, at:"22 Sep 2026, 14:05", admin:"Marshall Adiwijaya", type:"edit", desc:"Hid merchandise product — Topi Trucker RRI" },
+    { id:4, at:"21 Sep 2026, 11:30", admin:"Marshall Adiwijaya", type:"create", desc:"Added merchandise product — Jaket Riding RRI Jakarta" },
+    { id:5, at:"20 Sep 2026, 08:15", admin:"Marshall Adiwijaya", type:"create", desc:"Published announcement — Kopdar Bulanan Oktober 2026" },
+    { id:6, at:"19 Sep 2026, 16:50", admin:"Marshall Adiwijaya", type:"reject", desc:"Rejected member application — no payment proof" }
+  ];
+
+  // Rp 750.000 patch fee + Rp 150.000 KTA fee = Rp 900.000 total per applicant
+  var qrisTransactions = [
+    { id:1, payer:"BAGAS WIRAWAN", amount:"Rp 900.000", reference:"QRIS-88213-XT", receivedAt:"19 Sep 2026, 14:02", status:"unmatched" },
+    { id:2, payer:"MADE WIRAWAN", amount:"Rp 900.000", reference:"QRIS-88320-KL", receivedAt:"21 Sep 2026, 09:41", status:"unmatched" },
+    { id:3, payer:"RIZKY PRATAMA", amount:"Rp 900.000", reference:"QRIS-87950-AA", receivedAt:"18 Sep 2026, 07:15", status:"matched", matchedTo:"Rizky Pratama" },
+    { id:4, payer:"DANA-0812XXXX88", amount:"Rp 900.000", reference:"QRIS-88410-ZQ", receivedAt:"21 Sep 2026, 16:30", status:"unmatched" }
+  ];
+
+  var justMatchedIds = [];
+
+  var ROLES = ["Ketua Komunitas", "Wakil Ketua", "Sekretaris", "Bendahara", "Koordinator Touring", "Anggota"];
+
+  // ---------- DASHBOARD METRICS (mock 180-day history) ----------
+  function seededRandom(seed){
+    return function(){
+      seed = (seed * 1103515245 + 12345) & 0x7fffffff;
+      return seed / 0x7fffffff;
+    };
+  }
+  var metricRnd = seededRandom(42);
+
+  var METRIC_TODAY = new Date(2026, 8, 22); // 22 Sep 2026
+  var METRIC_DAYS = 180;
+
+  function isoDay(d){
+    var y = d.getFullYear(), mo = d.getMonth()+1, da = d.getDate();
+    return y + "-" + (mo<10?"0"+mo:mo) + "-" + (da<10?"0"+da:da);
+  }
+  function addDays(d, n){ var r = new Date(d); r.setDate(r.getDate()+n); return r; }
+  function mondayOf(d){ var dow = (d.getDay()+6)%7; return addDays(d, -dow); }
+
+  var dailyRevenue = [];
+  var dailyApps = [];
+  var dailyMatch = [];
+
+  (function buildDailyMetrics(){
+    for (var i = METRIC_DAYS - 1; i >= 0; i--){
+      var d = addDays(METRIC_TODAY, -i);
+      var day = isoDay(d);
+      var dow = d.getDay();
+      var weekendBoost = (dow===0||dow===6) ? 1 : 0;
+      var payCount = Math.floor(metricRnd()*3) + weekendBoost + (metricRnd()<0.12 ? 3 : 0);
+      dailyRevenue.push({ day:day, amount: payCount * 900000 });
+
+      dailyApps.push({
+        day:day,
+        approved: Math.floor(metricRnd()*2) + (metricRnd()<0.3 ? 1 : 0),
+        pending: Math.floor(metricRnd()*2),
+        rejected: metricRnd()<0.18 ? 1 : 0
+      });
+
+      dailyMatch.push({
+        day:day,
+        invoice: Math.floor(metricRnd()*2),
+        name: metricRnd()<0.35 ? 1 : 0,
+        manual: metricRnd()<0.25 ? 1 : 0,
+        unmatched: metricRnd()<0.15 ? 1 : 0
+      });
+    }
+  })();
+
+  var BY_COMMUNITY = [
+    { label:"Jakarta Selatan", count:62 }, { label:"Jakarta Barat", count:54 },
+    { label:"Jakarta Timur", count:48 }, { label:"Jakarta Utara", count:41 },
+    { label:"Jakarta Pusat", count:37 }, { label:"Bekasi", count:33 },
+    { label:"Tangerang", count:29 }, { label:"Depok", count:26 }, { label:"Bogor", count:21 }
+  ];
+  var BY_MOTO = [
+    { label:"Classic 350", count:78 }, { label:"Meteor 350", count:65 },
+    { label:"Hunter 350", count:54 }, { label:"Himalayan 450", count:39 },
+    { label:"Interceptor 650", count:31 }, { label:"Continental GT 650", count:24 },
+    { label:"Scram 411", count:19 }
+  ];
+  var BY_ISSUER = [
+    { label:"GoPay", count:142 }, { label:"OVO", count:98 }, { label:"DANA", count:76 },
+    { label:"ShopeePay", count:41 }, { label:"Bank Transfer", count:23 }
+  ];
+
+  // All-time community riding, from completed touring logged in the app
+  var RIDING_TOTALS = { km:48620, minutes:91440, tours:18 };
+  var TOP_RIDERS = [
+    { label:"Nadia Kusuma", count:1240 }, { label:"Teguh Santoso", count:1105 },
+    { label:"Hendra Gunawan", count:1032 }, { label:"Putri Ramadhani", count:980 },
+    { label:"Reza Mahendra", count:874 }, { label:"Sari Wulandari", count:812 }
+  ];
+
+  var TOTAL_ACTIVE_MEMBERS = 428;
+  function riderPct(riders){ return Math.round((riders/TOTAL_ACTIVE_MEMBERS)*100); }
+
+  var APP_SERIES = [
+    { key:"approved", labelKey:"seriesApproved", color:"var(--status-good)" },
+    { key:"pending", labelKey:"seriesPending", color:"var(--status-warning)" },
+    { key:"rejected", labelKey:"seriesRejected", color:"var(--status-critical)" }
+  ];
+  var MATCH_SERIES = [
+    { key:"invoice", labelKey:"seriesInvoice", color:"var(--series-1)" },
+    { key:"name", labelKey:"seriesName", color:"var(--series-2)" },
+    { key:"manual", labelKey:"seriesManual", color:"var(--series-3)" },
+    { key:"unmatched", labelKey:"seriesUnmatched", color:"var(--status-critical)" }
+  ];
+
+  function bucketizeSum(dailyList, range, bucket, keys){
+    var cur = dailyList.slice(METRIC_DAYS - range);
+    var map = {}, order = [];
+    cur.forEach(function(row){
+      var bkey = bucket==="day" ? row.day : isoDay(mondayOf(new Date(row.day+"T00:00:00")));
+      if (!map[bkey]){
+        map[bkey] = { bucket:bkey };
+        keys.forEach(function(k){ map[bkey][k] = 0; });
+        order.push(bkey);
+      }
+      keys.forEach(function(k){ map[bkey][k] += row[k]; });
+    });
+    return order.map(function(k){ return map[k]; });
+  }
+
+  function getMetrics(range){
+    var bucket = range > 30 ? "week" : "day";
+    var curRev = dailyRevenue.slice(METRIC_DAYS - range);
+    var prevRev = dailyRevenue.slice(Math.max(0, METRIC_DAYS - 2*range), METRIC_DAYS - range);
+    var revTotal = curRev.reduce(function(s,r){ return s+r.amount; }, 0);
+    var revPrev = prevRev.reduce(function(s,r){ return s+r.amount; }, 0);
+
+    var appSeries = bucketizeSum(dailyApps, range, bucket, ["approved","pending","rejected"]);
+    var matchSeriesArr = bucketizeSum(dailyMatch, range, bucket, ["invoice","name","manual","unmatched"]);
+
+    var matchCur = dailyMatch.slice(METRIC_DAYS - range);
+    var autoCount = matchCur.reduce(function(s,r){ return s + r.invoice + r.name; }, 0);
+    var totalTx = matchCur.reduce(function(s,r){ return s + r.invoice + r.name + r.manual + r.unmatched; }, 0);
+    var approvedInRange = appSeries.reduce(function(s,r){ return s+r.approved; }, 0);
+
+    return {
+      range: range, bucket: bucket,
+      revenue: { total: revTotal, prevTotal: revPrev, series: curRev },
+      members: {
+        active: TOTAL_ACTIVE_MEMBERS,
+        approvedInRange: approvedInRange,
+        pending: countBy(members, "pending"),
+        pendingUnpaid: members.filter(function(m){ return m.status==="pending" && m.payment==="Unpaid"; }).length
+      },
+      matching: {
+        rate: totalTx ? autoCount/totalTx : 0,
+        unmatchedOpen: countBy(qrisTransactions, "unmatched"),
+        series: matchSeriesArr
+      },
+      applications: appSeries,
+      reviewHoursMedian: 5.8,
+      byCommunity: BY_COMMUNITY, byMoto: BY_MOTO, byIssuer: BY_ISSUER
+    };
+  }
+
+  function rupiah(n){ return "Rp " + Math.round(n).toLocaleString("id-ID"); }
+  function compactRupiah(n){
+    var idLang = state.lang === "id";
+    if (Math.abs(n) >= 1e9) return "Rp " + (n/1e9).toFixed(1) + (idLang ? " M" : "B");
+    if (Math.abs(n) >= 1e6) return "Rp " + (n/1e6).toFixed(1) + (idLang ? " jt" : "M");
+    if (Math.abs(n) >= 1e3) return "Rp " + Math.round(n/1e3) + (idLang ? " rb" : "K");
+    return rupiah(n);
+  }
+  function fmtShortDay(dayIso){
+    var d = new Date(dayIso + "T00:00:00");
+    var months = MONTH_NAMES[state.lang] || MONTH_NAMES.en;
+    return d.getDate() + " " + months[d.getMonth()];
+  }
+  function bucketLabel(bkey, bucket){
+    return bucket==="day" ? fmtShortDay(bkey) : (state.lang==="id" ? "Mg " : "Wk ") + fmtShortDay(bkey);
+  }
+  function niceCeil(v){
+    if (v<=0) return 1;
+    var exp = Math.floor(Math.log(v)/Math.LN10);
+    var base = Math.pow(10, exp);
+    var f = v/base;
+    var niceF = f<=1 ? 1 : f<=2 ? 2 : f<=5 ? 5 : 10;
+    return niceF*base;
+  }
+
+  function ttAreaPoint(day, amount){
+    return '<div class="tt-title">'+esc(fmtShortDay(day))+'</div>'
+      + '<div class="tt-row"><span class="tt-key" style="background:var(--accent)"></span><span class="tt-val">'+esc(rupiah(amount))+'</span></div>';
+  }
+  function ttStackedBucket(bkey, bucket, seriesDefs, row){
+    var rows = seriesDefs.slice().reverse().map(function(d){
+      return '<div class="tt-row"><span class="tt-key" style="background:'+d.color+'"></span><span class="tt-val">'+(row[d.key]||0)+'</span><span class="tt-name">'+esc(t(d.labelKey))+'</span></div>';
+    }).join("");
+    return '<div class="tt-title">'+esc(bucketLabel(bkey, bucket))+'</div>'+rows;
+  }
+  function ttRanked(label, count){
+    return '<div class="tt-title">'+esc(label)+'</div><div class="tt-row"><span class="tt-val">'+count+'</span></div>';
+  }
+
+  var vizTooltipEl = null;
+  function ensureVizTooltip(){
+    if (!vizTooltipEl){
+      vizTooltipEl = document.createElement("div");
+      vizTooltipEl.className = "viz-tooltip";
+      vizTooltipEl.hidden = true;
+      document.body.appendChild(vizTooltipEl);
+    }
+    return vizTooltipEl;
+  }
+  function positionVizTooltip(x, y){
+    var el = ensureVizTooltip();
+    var pad = 14;
+    var rect = el.getBoundingClientRect();
+    var left = x + pad, top = y + pad;
+    if (left + rect.width > window.innerWidth - 8) left = x - rect.width - pad;
+    if (top + rect.height > window.innerHeight - 8) top = y - rect.height - pad;
+    el.style.left = Math.max(8,left) + "px";
+    el.style.top = Math.max(8,top) + "px";
+  }
+  function showVizTooltip(html, x, y){
+    var el = ensureVizTooltip();
+    el.innerHTML = html;
+    el.hidden = false;
+    positionVizTooltip(x, y);
+  }
+  function hideVizTooltip(){
+    if (vizTooltipEl) vizTooltipEl.hidden = true;
+    Array.prototype.forEach.call(document.querySelectorAll(".viz-area-marker, .viz-area-guide"), function(el){
+      el.setAttribute("opacity", "0");
+    });
+  }
+
+  function handleAreaOverlayHover(overlayEl, e){
+    var svg = overlayEl.closest ? overlayEl.closest("svg") : null;
+    if (!svg) return;
+    var rect = svg.getBoundingClientRect();
+    if (!rect.width) return;
+    var vb = svg.viewBox.baseVal;
+    var svgX = (e.clientX - rect.left) / rect.width * vb.width;
+
+    var pts = overlayEl.__vizPoints;
+    if (!pts){
+      pts = JSON.parse(overlayEl.getAttribute("data-area-points"));
+      overlayEl.__vizPoints = pts;
+    }
+    if (!pts.length) return;
+
+    var nearest = pts[0], best = Infinity;
+    for (var i=0;i<pts.length;i++){
+      var d = Math.abs(pts[i].x - svgX);
+      if (d < best){ best = d; nearest = pts[i]; }
+    }
+
+    var guide = svg.querySelector(".viz-area-guide");
+    if (guide){
+      guide.setAttribute("x1", nearest.x);
+      guide.setAttribute("x2", nearest.x);
+      guide.setAttribute("opacity", "1");
+    }
+    var marker = svg.querySelector(".viz-area-marker");
+    if (marker){
+      marker.setAttribute("cx", nearest.x);
+      marker.setAttribute("cy", nearest.y);
+      marker.setAttribute("opacity", "1");
+    }
+    showVizTooltip(ttAreaPoint(nearest.day, nearest.amount), e.clientX, e.clientY);
+  }
+
+  function svgPathsFromPoints(pts, baselineY){
+    var n = pts.length;
+    var linePath = pts.map(function(p,i){ return (i===0?"M":"L")+p.x.toFixed(1)+","+p.y.toFixed(1); }).join(" ");
+    var areaPath = linePath + " L"+pts[n-1].x.toFixed(1)+","+baselineY.toFixed(1)+" L"+pts[0].x.toFixed(1)+","+baselineY.toFixed(1)+" Z";
+    return { line:linePath, area:areaPath };
+  }
+
+  function buildAreaChartSvg(series, introGrow, size){
+    var W=size?size.w:600, H=size?size.h:220, padL=64, padR=12, padT=10, padB=26;
+    var innerW=W-padL-padR, innerH=H-padT-padB;
+    var n = series.length;
+    var max = series.reduce(function(m,s){ return Math.max(m,s.amount); }, 1);
+    var niceMax = niceCeil(max);
+    var baselineY = padT+innerH;
+    var pts = series.map(function(s,i){
+      var x = padL + (n<=1?0:(i/(n-1))*innerW);
+      var y = padT + innerH - (s.amount/niceMax)*innerH;
+      return { x:x, y:y, amount:s.amount, day:s.day };
+    });
+    var built = svgPathsFromPoints(pts, baselineY);
+    var linePath = built.line, areaPath = built.area;
+
+    var gridLines = "";
+    for (var g=0; g<=4; g++){
+      var gy = padT + innerH - (g/4)*innerH;
+      var val = (g/4)*niceMax;
+      gridLines += '<line x1="'+padL+'" y1="'+gy.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+gy.toFixed(1)+'" stroke="var(--grid)" stroke-width="1"/>';
+      gridLines += '<text x="'+(padL-8)+'" y="'+(gy+4).toFixed(1)+'" text-anchor="end" font-size="11" fill="var(--text-soft)">'+esc(compactRupiah(val))+'</text>';
+    }
+
+    var pointsJson = esc(JSON.stringify(pts.map(function(p){ return { x:p.x, y:p.y, day:p.day, amount:p.amount }; })));
+    var areaOverlay = '<rect class="viz-area-overlay" x="'+padL+'" y="'+padT+'" width="'+innerW+'" height="'+innerH+'" fill="transparent" data-area-points="'+pointsJson+'"></rect>';
+    var guide = '<line class="viz-area-guide" x1="0" y1="'+padT+'" x2="0" y2="'+(padT+innerH)+'" opacity="0"></line>';
+    var marker = '<circle class="viz-area-marker" r="4.5" fill="var(--accent)" stroke="var(--surface)" stroke-width="2" opacity="0"></circle>';
+
+    var xLabels = "";
+    var labelIdxs = n<=1 ? [0] : [0, Math.floor((n-1)/2), n-1];
+    labelIdxs.forEach(function(idx, k){
+      var p = pts[idx];
+      var anchor = labelIdxs.length>1 && k===0 ? "start" : labelIdxs.length>1 && k===labelIdxs.length-1 ? "end" : "middle";
+      xLabels += '<text x="'+p.x.toFixed(1)+'" y="'+(H-6)+'" text-anchor="'+anchor+'" font-size="11" fill="var(--text-soft)">'+esc(fmtShortDay(p.day))+'</text>';
+    });
+
+    var areaPathAttrs = "", linePathAttrs = "";
+    var initialAreaD = areaPath, initialLineD = linePath;
+    if (introGrow){
+      var ptsAttr = esc(JSON.stringify(pts.map(function(p){ return { x:p.x, y:p.y }; })));
+      var flatPts = pts.map(function(p){ return { x:p.x, y:baselineY }; });
+      var flatBuilt = svgPathsFromPoints(flatPts, baselineY);
+      initialAreaD = flatBuilt.area;
+      initialLineD = flatBuilt.line;
+      areaPathAttrs = ' class="viz-area-grow-fill" data-pts="'+ptsAttr+'" data-baseline="'+baselineY.toFixed(1)+'"';
+      linePathAttrs = ' class="viz-area-grow-line" data-pts="'+ptsAttr+'" data-baseline="'+baselineY.toFixed(1)+'"';
+    }
+
+    return '<svg viewBox="0 0 '+W+' '+H+'" class="viz-svg">'
+      + '<defs><linearGradient id="rev-wash" x1="0" y1="0" x2="0" y2="1">'
+      + '<stop offset="0%" stop-color="var(--accent)" stop-opacity="0.22"/>'
+      + '<stop offset="100%" stop-color="var(--accent)" stop-opacity="0.02"/></linearGradient></defs>'
+      + gridLines
+      + '<path d="'+initialAreaD+'" fill="url(#rev-wash)" stroke="none"'+areaPathAttrs+'/>'
+      + '<path d="'+initialLineD+'" fill="none" stroke="var(--accent)" stroke-width="2"'+linePathAttrs+'/>'
+      + xLabels + guide + marker + areaOverlay
+      + '</svg>';
+  }
+
+  function buildStackedBarSvg(series, seriesDefs, bucket, introGrow, size){
+    var W=size?size.w:600, H=size?size.h:220, padL=8, padR=8, padT=8, padB=24;
+    var innerW=W-padL-padR, innerH=H-padT-padB;
+    var n = series.length;
+    var totals = series.map(function(r){ return seriesDefs.reduce(function(s,d){ return s+(r[d.key]||0); }, 0); });
+    var max = totals.reduce(function(m,v){ return Math.max(m,v); }, 1);
+    var niceMax = niceCeil(max);
+    var bw = innerW/n;
+    var barW = Math.min(28, bw*0.6);
+    var baseline = padT+innerH;
+    var barDelayStep = Math.min(6, 200/Math.max(1,n));
+
+    var bars = "";
+    series.forEach(function(r,i){
+      var colX = padL + i*bw;
+      var x = colX + (bw-barW)/2;
+      var yCursor = baseline;
+      var segHtml = '<rect class="viz-hit" x="'+colX.toFixed(1)+'" y="'+padT+'" width="'+bw.toFixed(1)+'" height="'+innerH+'" fill="transparent"/>';
+      seriesDefs.forEach(function(d){
+        var v = r[d.key]||0;
+        if (!v) return;
+        var h = (v/niceMax)*innerH;
+        var y = yCursor - h;
+        if (introGrow){
+          segHtml += '<rect class="viz-grow" x="'+x.toFixed(1)+'" y="'+baseline.toFixed(1)+'" width="'+barW.toFixed(1)+'" height="0" data-fy="'+y.toFixed(1)+'" data-fh="'+h.toFixed(1)+'" data-delay="'+(i*barDelayStep).toFixed(0)+'" fill="'+d.color+'" style="pointer-events:none;"/>';
+        } else {
+          segHtml += '<rect x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+barW.toFixed(1)+'" height="'+h.toFixed(1)+'" fill="'+d.color+'" style="pointer-events:none;"/>';
+        }
+        yCursor = y;
+      });
+      bars += '<g data-tt="'+esc(ttStackedBucket(r.bucket, bucket, seriesDefs, r))+'">'+segHtml+'</g>';
+    });
+
+    var gridLines = "";
+    for (var g=0; g<=4; g++){
+      var gy = padT+innerH-(g/4)*innerH;
+      gridLines += '<line x1="'+padL+'" y1="'+gy.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+gy.toFixed(1)+'" stroke="var(--grid)" stroke-width="1"/>';
+    }
+
+    var xLabels = "";
+    var step = Math.max(1, Math.ceil(n/6));
+    series.forEach(function(r,i){
+      if (i%step!==0 && i!==n-1) return;
+      var x = padL + i*bw + bw/2;
+      xLabels += '<text x="'+x.toFixed(1)+'" y="'+(H-6)+'" text-anchor="middle" font-size="11" fill="var(--text-soft)">'+esc(bucketLabel(r.bucket, bucket))+'</text>';
+    });
+
+    return '<svg viewBox="0 0 '+W+' '+H+'" class="viz-svg">'+gridLines+bars+xLabels+'</svg>';
+  }
+
+  // SVG charts are drawn at the chart box's real pixel size so text and lines never stretch.
+  var chartBuilders = {};
+  function fitCharts(introGrow){
+    Array.prototype.forEach.call(document.querySelectorAll("#dashboard-view .chart-box[data-chart]"), function(box){
+      var build = chartBuilders[box.getAttribute("data-chart")];
+      var w = box.clientWidth, h = box.clientHeight;
+      if (!build || !w || !h) return;
+      if (box.__fitW===w && box.__fitH===h) return;
+      box.__fitW = w; box.__fitH = h;
+      box.innerHTML = build(introGrow, { w:w, h:h });
+    });
+  }
+
+  function buildRankedBarsHtml(data, color, introGrow, countSuffix, wideCount){
+    countSuffix = countSuffix || "";
+    var max = data.reduce(function(m,d){ return Math.max(m,d.count); }, 1);
+    return '<div class="ranked-bars'+(wideCount?" wide-count":"")+'">' + data.map(function(d,i){
+      var pct = Math.max(4, Math.round((d.count/max)*100));
+      var fillHtml = introGrow
+        ? '<div class="ranked-fill viz-grow-w" data-fw="'+pct+'" data-delay="'+(i*40)+'" style="width:0%; background:'+(color||"var(--accent)")+'"></div>'
+        : '<div class="ranked-fill" style="width:'+pct+'%; background:'+(color||"var(--accent)")+'"></div>';
+      var countTxt = fmtNum(d.count)+countSuffix;
+      return '<div class="ranked-row" data-tt="'+esc(ttRanked(d.label, countTxt))+'">'
+        + '<div class="ranked-label">'+esc(d.label)+'</div>'
+        + '<div class="ranked-track">'+fillHtml+'</div>'
+        + '<div class="ranked-count">'+countTxt+'</div>'
+        + '</div>';
+    }).join("") + '</div>';
+  }
+
+  function buildMiniTable(cols, rows){
+    return '<table class="mini-table"><thead><tr>'
+      + cols.map(function(c,i){ return '<th'+(i>0?' class="num"':'')+'>'+esc(c)+'</th>'; }).join("")
+      + '</tr></thead><tbody>'
+      + rows.map(function(r){ return '<tr>'+r.map(function(v,i){ return '<td'+(i>0?' class="num"':'')+'>'+esc(v)+'</td>'; }).join("")+'</tr>'; }).join("")
+      + '</tbody></table>';
+  }
+
+  function buildLegend(seriesDefs){
+    return '<div class="legend">' + seriesDefs.map(function(s){
+      return '<span class="legend-item"><span class="legend-swatch" style="background:'+s.color+'"></span>'+esc(t(s.labelKey))+'</span>';
+    }).join("") + '</div>';
+  }
+
+  function buildDeltaHtml(cur, prev, range){
+    if (!prev) return "";
+    var pct = ((cur-prev)/prev)*100;
+    var up = pct>=0;
+    return '<span class="kpi-sub"><span class="delta '+(up?"up":"down")+'">'+(up?"▲":"▼")+' '+Math.abs(pct).toFixed(1)+'%</span>'+t("vsPrev", range)+'</span>';
+  }
+
+  function buildCard(id, title, sub, wide, chartHtml, tableHtml, legendHtml, introDelayMs){
+    var showTable = !!state.dashChartView[id];
+    var cls = "card" + (wide?" wide":"") + (introDelayMs!=null?" intro-pop":"");
+    var style = introDelayMs!=null ? ' style="animation-delay:'+introDelayMs+'ms"' : "";
+    return '<section class="'+cls+'"'+style+'>'
+      + '<div class="card-head"><div><div class="card-title">'+esc(title)+'</div><div class="card-sub">'+esc(sub)+'</div></div>'
+      + '<button type="button" class="view-toggle" data-toggle-chart="'+id+'" aria-pressed="'+showTable+'">'+(showTable?t("showChart"):t("showTable"))+'</button></div>'
+      + (legendHtml||"")
+      + (showTable ? '<div class="mini-table-wrap">'+tableHtml+'</div>' : '<div class="chart-box'+(id==="revenue"?" tall":"")+(id==="riders"?" auto":"")+'" data-chart="'+id+'">'+chartHtml+'</div>')
+      + '</section>';
+  }
+
+  var I18N = {
+    en: {
+      loginSub: "Member verification for Royal Riders Indonesia Jakarta",
+      signIn: "Sign in with Google",
+      signingIn: "Signing in…",
+      loginNote: "Access is restricted to authorized Rojak admins. If you believe this is a mistake, contact a core team member.",
+      roleBadge: "Core Team Admin",
+      themeDark: "Dark",
+      themeLight: "Light",
+      logOut: "Log out",
+      logoutConfirmTitle: "Log out?",
+      logoutConfirmBody: "You'll need to sign in again to access the admin panel.",
+      navDashboard: "Dashboard",
+      navGroupMembers: "Members",
+      navGroupCommunity: "Community",
+      navGroupSystem: "System",
+      navMemberReview: "Member Review",
+      navMemberDirectory: "Member Directory",
+      navQris: "QRIS Monitoring",
+      navAnnouncements: "Announcements",
+      navAgenda: "Agenda",
+      navTouring: "Touring Routes",
+      navMerch: "Merchandise",
+      navLora: "LoRa Devices",
+      navAuditLog: "Audit Log",
+      searchPlaceholder: "Search...",
+
+      secDashboardTitle: "Dashboard",
+      secDashboardDesc: "A quick snapshot of what needs attention across Rojak.",
+      secMembersTitle: "Member Review",
+      secMembersDesc: "Every applicant — new and previously registered — goes through this one queue now.",
+      secDirectoryTitle: "Member Directory",
+      secDirectoryDesc: "Every approved member and the role each one holds in the community.",
+      secQrisTitle: "QRIS Monitoring",
+      secQrisDesc: "Match incoming payments to the applicant who paid, then confirm — nothing is matched automatically.",
+      secAnnouncementsTitle: "Announcements",
+      secAnnouncementsDesc: "Pengumuman posted here appear on every member's home screen.",
+      secAgendaTitle: "Agenda",
+      secAgendaDesc: "Upcoming touring and community events shown on the member app.",
+      secTouringTitle: "Touring Routes",
+      secTouringDesc: "Activate a route so members see navigation and trip info in the app.",
+      secMerchTitle: "Merchandise",
+      secMerchDesc: "Official community merch sold in the app. Manage products and process members’ orders.",
+      secLoraTitle: "LoRa Devices",
+      secLoraDesc: "Mesh radio devices members have paired from the app for off-grid touring comms.",
+      secAuditLogTitle: "Audit Log",
+      secAuditLogDesc: "A record of actions taken by admins in this panel.",
+
+      addAnnouncement: "+ Add Announcement",
+      addAgenda: "+ Add Agenda",
+      addRoute: "+ Add Route",
+      addMerch: "+ Add Product",
+
+      tabPending: "Pending", tabApproved: "Approved", tabRejected: "Rejected",
+      tabUnmatched: "Unmatched", tabMatched: "Matched",
+      tabProducts: "Products", tabOrders: "Orders",
+      tabUpcoming: "Upcoming", tabCompleted: "Completed",
+      colProduct: "Product", colStock: "Stock", colSold: "Sold",
+      colOrder: "Order", colBuyer: "Buyer", colItems: "Items", colTotal: "Total",
+      colDistance: "Distance", colDuration: "Duration", colRider: "Rider",
+      btnHide: "Hide", btnShowInApp: "Show in app", btnProcess: "Process", btnMarkShipped: "Mark shipped",
+      btnMarkDone: "Complete", btnAddProduct: "Add product",
+      chipHidden: "Hidden", chipSoldOut: "Sold out", chipNewOrder: "New", chipProcessing: "Processing",
+      chipShipped: "Shipped", chipDone: "Completed", chipLeader: "Leader", chipMember: "Member",
+      emptyProducts: "No products{0} yet.", emptyOrders: "No orders{0} yet.",
+      emptyTouringUpcoming: "No upcoming touring{0}.", emptyTouringDone: "No completed touring{0} yet.",
+      fieldCategory: "Category", fieldStock: "Stock", fieldSold: "Sold", fieldProductName: "Product name",
+      fieldBuyer: "Buyer", fieldShipTo: "Ship to", fieldOrderedOn: "Ordered", fieldItems: "Items",
+      fieldEmail: "Email", fieldBirthDate: "Birth date", fieldJob: "Occupation", fieldMemberSince: "Member since",
+      fieldDistance: "Distance ridden", fieldRideTime: "Ride time", fieldToursDone: "Tours completed",
+      garageTitle: "Garage", garageMotors: "Motorcycles", garageHelmets: "Helmets",
+      garageNoMotors: "No motorcycles in this member’s garage yet.", garageNoHelmets: "No helmets in this member’s garage yet.",
+      helmetSize: "Size {0}",
+      participantsTitle: "Participants", participantsShowing: "Showing {0} of {1} registered riders",
+      statNewOrders: "New Merch Orders",
+      chartRiders: "Most active riders", chartRidersSub: "Distance ridden on completed touring, all time",
+      rideTotalKm: "Total distance", rideTotalTime: "Total ride time", rideToursDone: "Tours completed",
+      durHM: "{0} h {1} m",
+
+      colName: "Name", colMotorcycle: "Motorcycle", colCommunity: "Community", colPayment: "Payment",
+      colAction: "Action", colKodeKomunitas: "Community Code", colReason: "Reason",
+      colItem: "Item", colSeller: "Seller", colPrice: "Price", colStatus: "Status",
+      colPayer: "Payer", colAmount: "Amount", colReference: "Reference", colReceived: "Received",
+      colTitle: "Title", colDescription: "Description", colPosted: "Posted",
+      colDate: "Date", colLocation: "Location", colRoute: "Route", colWaypoints: "Waypoints",
+      colScheduled: "Scheduled", colRole: "Role", colRiders: "Riders",
+      colDevice: "Device", colOwner: "Owner", colLastSeen: "Last Seen",
+      colTimestamp: "Time", colAdmin: "Admin", colActivity: "Activity",
+
+      btnApprove: "Approve", btnReject: "Reject", btnConfirmReject: "Confirm reject", btnCancel: "Cancel",
+      btnRemove: "Remove", btnActivate: "Activate", btnDeactivate: "Deactivate", btnUnpair: "Unpair",
+      matchSelectPlaceholder: "Select applicant...", matchNoApplicants: "No pending applicants",
+      btnPostAnnouncement: "Post announcement", btnAddToAgenda: "Add to agenda", btnAddRouteSubmit: "Add route",
+
+      chipPaid: "Paid", chipUnpaid: "Unpaid", chipActive: "Active", chipInactive: "Inactive",
+      chipLiveInApp: "Live in app", chipRejected: "Rejected", chipNoNameMatch: "No name match",
+      chipMatchedPrefix: "Matched — ", chipOnline: "Online", chipOffline: "Offline",
+      chipAuditApprove: "Approved", chipAuditReject: "Rejected", chipAuditEdit: "Updated", chipAuditCreate: "Created",
+
+      emptyMembers: "No {0} members{1}.",
+      emptyTransactions: "No {0} transactions{1}.",
+      emptyDirectory: "No approved members{0} yet.",
+      emptyQuerySuffix: " match “{0}”",
+      emptyAnnouncements: "No announcements yet.",
+      emptyAgenda: "No agenda items yet.",
+      emptyTouring: "No touring routes yet.",
+      emptyLora: "No devices paired{0} yet.",
+      emptyAuditLog: "No activity logged{0} yet.",
+
+      fieldPhone: "Phone / WA", fieldPlate: "Motorcycle plate", fieldSubmitted: "Submitted",
+      fieldPatchFee: "Patch fee (Rp 750.000)", fieldKtaFee: "KTA fee (Rp 150.000)", fieldCoc: "Code of conduct",
+      valAgreed: "Agreed", valNotAgreed: "Not agreed", valAwaitingProof: "Awaiting proof",
+      fieldReasonSent: "Reason sent to applicant", fieldDecidedOn: "Decided on",
+      fieldSeller: "Seller", fieldPrice: "Price", fieldPosted: "Posted", fieldDescription: "Description",
+      fieldDeviceId: "Device ID", fieldModel: "Model", fieldFirmware: "Firmware", fieldBattery: "Battery",
+      fieldOwner: "Owner", fieldLastSeen: "Last seen",
+
+      rejectLabel: "Reason (sent to the applicant by email)",
+
+      fieldTitle: "Title", fieldDescription: "Description", fieldDate: "Date", fieldLocation: "Location",
+      fieldNote: "Note", fieldRouteName: "Route name", fieldScheduledFor: "Scheduled for", fieldWaypoints: "Waypoints",
+      fieldTime: "Time", fieldDepartTime: "Departure time", fieldPostTime: "Post time", colDateTime: "Date & time",
+
+      statPendingMembers: "Pending Applications", statUnmatchedPayments: "Unmatched Payments",
+      statLoraOnline: "LoRa Devices Online",
+      statActiveRoutes: "Active Touring Routes", statApprovedMembers: "Approved Members",
+      dashboardActivityTitle: "Recent Activity", dashboardViewAll: "View all",
+
+      range7: "7 days", range30: "30 days", range90: "90 days",
+      kpiRevenue: "QRIS revenue", kpiRevenueSub: "last {0} days",
+      kpiMembers: "Active members", kpiNewMembers: "+{0} approved in range",
+      kpiPending: "Awaiting review", kpiPendingSub: "{0} still unpaid",
+      kpiMatchRate: "Auto-match rate", kpiMatchRateSub: "{0} unmatched payments",
+      kpiApprovalTime: "Median review time", kpiApprovalTimeSub: "submission → decision",
+      vsPrev: "vs previous {0} days",
+      chartRevenue: "Daily QRIS revenue",
+      chartRevenueSub: "Rupiah received per day, all payments",
+      chartApplications: "Applications by outcome",
+      chartApplicationsSub: "By submission date",
+      groupedDaily: "per day",
+      groupedWeekly: "per week (Mon–Sun)",
+      chartMatch: "How payments were matched",
+      chartMatchSub: "Count of QRIS payments",
+      chartCommunity: "Members by community",
+      chartCommunitySub: "Approved members, all time",
+      chartMoto: "Motorcycle models",
+      chartMotoSub: "Approved members, all time",
+      chartIssuer: "Payments by wallet / bank",
+      chartIssuerSub: "Share of QRIS payments in range",
+      chartTouring: "Rider turnout by session",
+      chartTouringSub: "Riders joined vs. total active members",
+      showTable: "Table", showChart: "Chart",
+      seriesApproved: "Approved", seriesPending: "Pending", seriesRejected: "Rejected",
+      seriesInvoice: "Invoice number", seriesName: "Payer name", seriesManual: "Manual", seriesUnmatched: "Unmatched",
+      colWeek: "Week", colDay: "Day", colRevenue: "Revenue", colCount: "Count", colShare: "Share", colIssuer: "Issuer",
+      hours: "{0} h", days: "{0} d"
+    },
+    id: {
+      loginSub: "Verifikasi anggota untuk Royal Riders Indonesia Jakarta",
+      signIn: "Masuk dengan Google",
+      signingIn: "Sedang masuk…",
+      loginNote: "Akses hanya untuk admin Rojak yang berwenang. Jika menurut Anda ini keliru, hubungi anggota core team.",
+      roleBadge: "Admin Tim Inti",
+      themeDark: "Gelap",
+      themeLight: "Terang",
+      logOut: "Keluar",
+      logoutConfirmTitle: "Keluar?",
+      logoutConfirmBody: "Anda perlu masuk kembali untuk mengakses panel admin.",
+      navDashboard: "Dasbor",
+      navGroupMembers: "Anggota",
+      navGroupCommunity: "Komunitas",
+      navGroupSystem: "Sistem",
+      navMemberReview: "Tinjau Anggota",
+      navMemberDirectory: "Direktori Anggota",
+      navQris: "Monitoring QRIS",
+      navAnnouncements: "Pengumuman",
+      navAgenda: "Agenda",
+      navTouring: "Rute Touring",
+      navMerch: "Merchandise",
+      navLora: "Perangkat LoRa",
+      navAuditLog: "Log Aktivitas",
+      searchPlaceholder: "Cari...",
+
+      secDashboardTitle: "Dasbor",
+      secDashboardDesc: "Ringkasan cepat tentang apa yang perlu diperhatikan di Rojak.",
+      secMembersTitle: "Tinjau Anggota",
+      secMembersDesc: "Setiap pendaftar — baru maupun yang sudah pernah terdaftar — melewati satu antrean ini sekarang.",
+      secDirectoryTitle: "Direktori Anggota",
+      secDirectoryDesc: "Semua anggota yang disetujui beserta peran masing-masing di komunitas.",
+      secQrisTitle: "Monitoring QRIS",
+      secQrisDesc: "Cocokkan pembayaran masuk ke pendaftar yang membayar, lalu konfirmasi — tidak ada yang dicocokkan otomatis.",
+      secAnnouncementsTitle: "Pengumuman",
+      secAnnouncementsDesc: "Pengumuman yang diposting di sini muncul di beranda setiap anggota.",
+      secAgendaTitle: "Agenda",
+      secAgendaDesc: "Touring dan kegiatan komunitas mendatang yang ditampilkan di aplikasi anggota.",
+      secTouringTitle: "Rute Touring",
+      secTouringDesc: "Aktifkan rute agar anggota bisa melihat navigasi dan info perjalanan di aplikasi.",
+      secMerchTitle: "Merchandise",
+      secMerchDesc: "Merch resmi komunitas yang dijual di aplikasi. Kelola produk dan proses pesanan anggota.",
+      secLoraTitle: "Perangkat LoRa",
+      secLoraDesc: "Perangkat radio mesh yang dipasangkan anggota dari aplikasi untuk komunikasi touring di luar jangkauan sinyal.",
+      secAuditLogTitle: "Log Aktivitas",
+      secAuditLogDesc: "Catatan tindakan yang dilakukan admin di panel ini.",
+
+      addAnnouncement: "+ Tambah Pengumuman",
+      addAgenda: "+ Tambah Agenda",
+      addRoute: "+ Tambah Rute",
+      addMerch: "+ Tambah Produk",
+
+      tabPending: "Tertunda", tabApproved: "Disetujui", tabRejected: "Ditolak",
+      tabUnmatched: "Belum Cocok", tabMatched: "Cocok",
+      tabProducts: "Produk", tabOrders: "Pesanan",
+      tabUpcoming: "Mendatang", tabCompleted: "Selesai",
+      colProduct: "Produk", colStock: "Stok", colSold: "Terjual",
+      colOrder: "Pesanan", colBuyer: "Pembeli", colItems: "Barang", colTotal: "Total",
+      colDistance: "Jarak", colDuration: "Durasi", colRider: "Rider",
+      btnHide: "Sembunyikan", btnShowInApp: "Tampilkan", btnProcess: "Proses", btnMarkShipped: "Tandai dikirim",
+      btnMarkDone: "Selesaikan", btnAddProduct: "Tambahkan produk",
+      chipHidden: "Disembunyikan", chipSoldOut: "Habis", chipNewOrder: "Baru", chipProcessing: "Diproses",
+      chipShipped: "Dikirim", chipDone: "Selesai", chipLeader: "Leader", chipMember: "Member",
+      emptyProducts: "Belum ada merchandise{0}.", emptyOrders: "Belum ada pesanan{0}.",
+      emptyTouringUpcoming: "Belum ada touring mendatang{0}.", emptyTouringDone: "Belum ada touring yang selesai{0}.",
+      fieldCategory: "Kategori", fieldStock: "Stok", fieldSold: "Terjual", fieldProductName: "Nama produk",
+      fieldBuyer: "Pembeli", fieldShipTo: "Alamat kirim", fieldOrderedOn: "Dipesan", fieldItems: "Barang",
+      fieldEmail: "Email", fieldBirthDate: "Tanggal lahir", fieldJob: "Pekerjaan", fieldMemberSince: "Anggota sejak",
+      fieldDistance: "Total jarak", fieldRideTime: "Total durasi", fieldToursDone: "Touring selesai",
+      garageTitle: "Garasi", garageMotors: "Motor", garageHelmets: "Helm",
+      garageNoMotors: "Belum ada motor di garasi anggota ini.", garageNoHelmets: "Belum ada helm di garasi anggota ini.",
+      helmetSize: "Ukuran {0}",
+      participantsTitle: "Peserta", participantsShowing: "Menampilkan {0} dari {1} peserta terdaftar",
+      statNewOrders: "Pesanan Merch Baru",
+      chartRiders: "Rider paling aktif", chartRidersSub: "Jarak tempuh dari touring yang selesai, sepanjang waktu",
+      rideTotalKm: "Total jarak", rideTotalTime: "Total waktu riding", rideToursDone: "Touring selesai",
+      durHM: "{0} j {1} m",
+
+      colName: "Nama", colMotorcycle: "Motor", colCommunity: "Komunitas", colPayment: "Pembayaran",
+      colAction: "Aksi", colKodeKomunitas: "Kode Komunitas", colReason: "Alasan",
+      colItem: "Barang", colSeller: "Penjual", colPrice: "Harga", colStatus: "Status",
+      colPayer: "Pembayar", colAmount: "Jumlah", colReference: "Referensi", colReceived: "Diterima",
+      colTitle: "Judul", colDescription: "Deskripsi", colPosted: "Diposting",
+      colDate: "Tanggal", colLocation: "Lokasi", colRoute: "Rute", colWaypoints: "Titik Rute",
+      colScheduled: "Jadwal", colRole: "Peran", colRiders: "Pengendara",
+      colDevice: "Perangkat", colOwner: "Pemilik", colLastSeen: "Terakhir Terlihat",
+      colTimestamp: "Waktu", colAdmin: "Admin", colActivity: "Aktivitas",
+
+      btnApprove: "Setujui", btnReject: "Tolak", btnConfirmReject: "Konfirmasi tolak", btnCancel: "Batal",
+      btnRemove: "Hapus", btnActivate: "Aktifkan", btnDeactivate: "Nonaktifkan", btnUnpair: "Lepas Pasangan",
+      matchSelectPlaceholder: "Pilih pendaftar...", matchNoApplicants: "Tidak ada pendaftar tertunda",
+      btnPostAnnouncement: "Posting pengumuman", btnAddToAgenda: "Tambahkan ke agenda", btnAddRouteSubmit: "Tambahkan rute",
+
+      chipPaid: "Lunas", chipUnpaid: "Belum Lunas", chipActive: "Aktif", chipInactive: "Nonaktif",
+      chipLiveInApp: "Tayang di aplikasi", chipRejected: "Ditolak", chipNoNameMatch: "Nama tidak cocok",
+      chipMatchedPrefix: "Cocok — ", chipOnline: "Online", chipOffline: "Offline",
+      chipAuditApprove: "Disetujui", chipAuditReject: "Ditolak", chipAuditEdit: "Diperbarui", chipAuditCreate: "Dibuat",
+
+      emptyMembers: "Belum ada anggota {0}{1}.",
+      emptyTransactions: "Belum ada transaksi {0}{1}.",
+      emptyDirectory: "Belum ada anggota yang disetujui{0}.",
+      emptyQuerySuffix: " yang cocok dengan “{0}”",
+      emptyAnnouncements: "Belum ada pengumuman.",
+      emptyAgenda: "Belum ada agenda.",
+      emptyTouring: "Belum ada rute touring.",
+      emptyLora: "Belum ada perangkat yang terpasang{0}.",
+      emptyAuditLog: "Belum ada aktivitas tercatat{0}.",
+
+      fieldPhone: "Telepon / WA", fieldPlate: "Plat motor", fieldSubmitted: "Diajukan",
+      fieldPatchFee: "Biaya patch (Rp 750.000)", fieldKtaFee: "Biaya KTA (Rp 150.000)", fieldCoc: "Kode etik",
+      valAgreed: "Disetujui", valNotAgreed: "Belum disetujui", valAwaitingProof: "Menunggu bukti",
+      fieldReasonSent: "Alasan dikirim ke pendaftar", fieldDecidedOn: "Diputuskan pada",
+      fieldSeller: "Penjual", fieldPrice: "Harga", fieldPosted: "Diposting", fieldDescription: "Deskripsi",
+      fieldDeviceId: "ID Perangkat", fieldModel: "Model", fieldFirmware: "Firmware", fieldBattery: "Baterai",
+      fieldOwner: "Pemilik", fieldLastSeen: "Terakhir terlihat",
+
+      rejectLabel: "Alasan (dikirim ke pendaftar via email)",
+
+      fieldTitle: "Judul", fieldDescription: "Deskripsi", fieldDate: "Tanggal", fieldLocation: "Lokasi",
+      fieldNote: "Catatan", fieldRouteName: "Nama rute", fieldScheduledFor: "Dijadwalkan untuk", fieldWaypoints: "Titik rute",
+      fieldTime: "Waktu", fieldDepartTime: "Jam berangkat", fieldPostTime: "Jam posting", colDateTime: "Tanggal & waktu",
+
+      statPendingMembers: "Pendaftar Tertunda", statUnmatchedPayments: "Pembayaran Belum Cocok",
+      statLoraOnline: "Perangkat LoRa Online",
+      statActiveRoutes: "Rute Touring Aktif", statApprovedMembers: "Anggota Disetujui",
+      dashboardActivityTitle: "Aktivitas Terbaru", dashboardViewAll: "Lihat semua",
+
+      range7: "7 hari", range30: "30 hari", range90: "90 hari",
+      kpiRevenue: "Pendapatan QRIS", kpiRevenueSub: "{0} hari terakhir",
+      kpiMembers: "Anggota aktif", kpiNewMembers: "+{0} disetujui dalam periode",
+      kpiPending: "Menunggu tinjauan", kpiPendingSub: "{0} belum membayar",
+      kpiMatchRate: "Tingkat cocok otomatis", kpiMatchRateSub: "{0} pembayaran belum cocok",
+      kpiApprovalTime: "Median waktu tinjau", kpiApprovalTimeSub: "pengajuan → keputusan",
+      vsPrev: "vs {0} hari sebelumnya",
+      chartRevenue: "Pendapatan QRIS harian",
+      chartRevenueSub: "Rupiah diterima per hari, semua pembayaran",
+      chartApplications: "Pendaftaran menurut hasil",
+      chartApplicationsSub: "Menurut tanggal pengajuan",
+      groupedDaily: "per hari",
+      groupedWeekly: "per minggu (Sen–Min)",
+      chartMatch: "Cara pembayaran dicocokkan",
+      chartMatchSub: "Jumlah pembayaran QRIS",
+      chartCommunity: "Anggota per komunitas",
+      chartCommunitySub: "Anggota disetujui, sepanjang waktu",
+      chartMoto: "Model motor",
+      chartMotoSub: "Anggota disetujui, sepanjang waktu",
+      chartIssuer: "Pembayaran per dompet / bank",
+      chartIssuerSub: "Porsi pembayaran QRIS dalam periode",
+      chartTouring: "Partisipasi pengendara per sesi",
+      chartTouringSub: "Pengendara ikut vs. total anggota aktif",
+      showTable: "Tabel", showChart: "Grafik",
+      seriesApproved: "Disetujui", seriesPending: "Tertunda", seriesRejected: "Ditolak",
+      seriesInvoice: "Nomor tagihan", seriesName: "Nama pembayar", seriesManual: "Manual", seriesUnmatched: "Belum cocok",
+      colWeek: "Minggu", colDay: "Hari", colRevenue: "Pendapatan", colCount: "Jumlah", colShare: "Porsi", colIssuer: "Penerbit",
+      hours: "{0} jam", days: "{0} hari"
+    }
+  };
+
+  function t(key){
+    var str = (I18N[state.lang] && I18N[state.lang][key]) || I18N.en[key] || key;
+    for (var i=1;i<arguments.length;i++){
+      str = str.replace("{"+(i-1)+"}", arguments[i]);
+    }
+    return str;
+  }
+
+  var SECTIONS = {
+    dashboard:     { titleKey:"secDashboardTitle", descKey:"secDashboardDesc" },
+    members:       { titleKey:"secMembersTitle", descKey:"secMembersDesc" },
+    directory:     { titleKey:"secDirectoryTitle", descKey:"secDirectoryDesc" },
+    qris:          { titleKey:"secQrisTitle", descKey:"secQrisDesc" },
+    announcements: { titleKey:"secAnnouncementsTitle", descKey:"secAnnouncementsDesc", addLabelKey:"addAnnouncement" },
+    agenda:        { titleKey:"secAgendaTitle", descKey:"secAgendaDesc", addLabelKey:"addAgenda" },
+    touring:       { titleKey:"secTouringTitle", descKey:"secTouringDesc", addLabelKey:"addRoute" },
+    merchandise:   { titleKey:"secMerchTitle", descKey:"secMerchDesc", addLabelKey:"addMerch" },
+    lora:          { titleKey:"secLoraTitle", descKey:"secLoraDesc" },
+    auditlog:      { titleKey:"secAuditLogTitle", descKey:"secAuditLogDesc" }
+  };
+
+  var MEMBER_TABS = [
+    { key:"pending", labelKey:"tabPending" },
+    { key:"approved", labelKey:"tabApproved" },
+    { key:"rejected", labelKey:"tabRejected" }
+  ];
+
+  var MERCH_TABS = [
+    { key:"products", labelKey:"tabProducts" },
+    { key:"orders", labelKey:"tabOrders" }
+  ];
+
+  var TOURING_TABS = [
+    { key:"upcoming", labelKey:"tabUpcoming" },
+    { key:"completed", labelKey:"tabCompleted" }
+  ];
+
+  var QRIS_TABS = [
+    { key:"unmatched", labelKey:"tabUnmatched" },
+    { key:"matched", labelKey:"tabMatched" }
+  ];
+
+  var state = {
+    section:"dashboard", lang:"id",
+    memberTab:"pending", merchTab:"products", touringTab:"upcoming", qrisTab:"unmatched",
+    query:"", openDetail:null, openReject:null,
+    addPanelOpen:false,
+    dashRange:30, dashChartView:{}, dashboardIntroPending:false
+  };
+
+  function countBy(list, key){ return list.filter(function(m){ return m.status===key; }).length; }
+
+  function genCode(){
+    var chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    var out = "RJK-";
+    for (var i=0;i<5;i++) out += chars[Math.floor(Math.random()*chars.length)];
+    return out;
+  }
+
+  function nextId(list){
+    return list.reduce(function(max,m){ return Math.max(max,m.id); }, 0) + 1;
+  }
+
+  function esc(s){
+    return String(s==null ? "" : s).replace(/[&<>"]/g, function(c){
+      return { "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" }[c];
+    });
+  }
+
+  function toast(msg){
+    var stack = document.getElementById("toast-stack");
+    var el = document.createElement("div");
+    el.className = "toast";
+    el.textContent = msg;
+    stack.appendChild(el);
+    requestAnimationFrame(function(){ el.classList.add("show"); });
+    setTimeout(function(){
+      el.classList.remove("show");
+      setTimeout(function(){ el.remove(); }, 250);
+    }, 3200);
+  }
+
+  var REACTION_ICONS = {
+    up: '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M2 9h4v12H2zM22 11a2 2 0 0 0-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L13.17 2 7.59 7.59C7.22 7.95 7 8.45 7 9v10a2 2 0 0 0 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z"/></svg>',
+    down: '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M22 15h-4V3h4zM2 13a2 2 0 0 0 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L10.83 22l5.58-5.59c.37-.36.59-.86.59-1.41V5a2 2 0 0 0-2-2H6c-.83 0-1.54.5-1.84 1.22L1.14 11.27c-.09.23-.14.47-.14.73v1z"/></svg>',
+    trash: '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>',
+    check: '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>',
+    eyeoff: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">'
+      + '<g class="eye-open"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3" fill="currentColor"/></g>'
+      + '<g class="eye-closed"><path d="M2 11s3.5 6 10 6 10-6 10-6"/><line x1="5" y1="14.2" x2="3.4" y2="16.4"/><line x1="9.3" y1="16.6" x2="8.7" y2="19.2"/><line x1="14.7" y1="16.6" x2="15.3" y2="19.2"/><line x1="19" y1="14.2" x2="20.6" y2="16.4"/></g>'
+      + '</svg>',
+    x: '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm5 13.6L15.6 17 12 13.4 8.4 17 7 15.6l3.6-3.6L7 8.4 8.4 7l3.6 3.6L15.6 7 17 8.4 13.4 12l3.6 3.6z"/></svg>',
+    wave: '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="13" width="14" height="9" rx="3"/><rect x="7" y="6" width="2.4" height="11" rx="1.2"/><rect x="10.2" y="4" width="2.4" height="13" rx="1.2"/><rect x="13.4" y="5" width="2.4" height="12" rx="1.2"/><rect x="16.6" y="7.5" width="2.2" height="9.5" rx="1.1"/><rect x="2.3" y="12.5" width="2.4" height="6.5" rx="1.2" transform="rotate(-35 3.5 15.75)"/><path d="M20 7.5c1 0 1.8.7 1.9 1.7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" fill="none"/><path d="M21 4.2c1.5.1 2.7 1.4 2.8 3.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" fill="none"/></svg>'
+  };
+  // Same drawing; CSS runs the blink in reverse for "show"
+  REACTION_ICONS.eyeon = REACTION_ICONS.eyeoff;
+
+  function playButtonReaction(btn, type, onDone){
+    var icon = REACTION_ICONS[type] || REACTION_ICONS.check;
+    var actions = btn.closest(".row-actions, .actions");
+    if (actions){
+      Array.prototype.forEach.call(actions.querySelectorAll("button"), function(b){ b.disabled = true; });
+    }
+    btn.classList.add("btn-reacting");
+    btn.innerHTML = '<span class="btn-reaction-icon icon-'+type+'">'+icon+'</span>';
+    setTimeout(onDone, (type==="eyeoff" || type==="eyeon") ? 650 : 480);
+  }
+
+  function field(k,v,full){
+    return '<div class="detail-field'+(full?' full':'')+'"><div class="k">'+esc(k)+'</div><div class="v">'+esc(v)+'</div></div>';
+  }
+
+  // Date on the first line, time (WIB) underneath
+  function dateTimeCell(date, time){
+    return '<div><div>'+esc(date)+'</div>' + (time ? '<div class="cell-sub">'+esc(time)+' WIB</div>' : '') + '</div>';
+  }
+  function nowHHMM(){ var d = new Date(); return pad2(d.getHours()) + ":" + pad2(d.getMinutes()); }
+
+  function fmtNum(n){ return Math.round(n).toLocaleString(state.lang==="id" ? "id-ID" : "en-GB"); }
+  function fmtDuration(min){ return t("durHM", Math.floor(min/60), min%60); }
+  function initialOf(name){ return esc((name||"?").trim().charAt(0).toUpperCase()); }
+
+  // Reusable tab strip: tabs = [{key,labelKey}], countFn(key) → number, onPick(key)
+  function renderTabStrip(tabs, activeKey, countFn, onPick){
+    var wrap = document.getElementById("tabs");
+    Array.prototype.forEach.call(wrap.querySelectorAll(".tab"), function(el){ el.remove(); });
+    tabs.forEach(function(tb){
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "tab" + (activeKey===tb.key ? " active" : "");
+      btn.innerHTML = t(tb.labelKey) + ' <span class="count">(' + countFn(tb.key) + ')</span>';
+      btn.addEventListener("click", function(){ onPick(tb.key); });
+      wrap.appendChild(btn);
+    });
+    updateTabThumb();
+  }
+
+  // ---------- NAV ----------
+  function renderNav(){
+    Array.prototype.forEach.call(document.querySelectorAll(".nav-item[data-section]"), function(btn){
+      btn.classList.toggle("active", btn.getAttribute("data-section")===state.section);
+    });
+    document.getElementById("pending-tag").textContent = countBy(members,"pending");
+    document.getElementById("merch-tag").textContent = countBy(merchOrders,"new");
+    document.getElementById("qris-tag").textContent = countBy(qrisTransactions,"unmatched");
+    document.getElementById("lora-tag").textContent = countBy(loraDevices,"online");
+    updateNavThumb();
+  }
+
+  function updateNavThumb(){
+    var thumb = document.getElementById("nav-thumb");
+    var active = document.querySelector(".nav-item.active");
+    if (!thumb || !active) return;
+    thumb.style.top = active.offsetTop + "px";
+    thumb.style.height = active.offsetHeight + "px";
+    thumb.style.opacity = 1;
+  }
+
+  function updateTabThumb(){
+    var thumb = document.getElementById("tab-thumb");
+    var active = document.querySelector("#tabs .tab.active");
+    if (!thumb || !active) { if (thumb) thumb.style.opacity = 0; return; }
+    thumb.style.left = active.offsetLeft + "px";
+    thumb.style.width = active.offsetWidth + "px";
+    thumb.style.opacity = 1;
+  }
+
+  function openSidebar(){
+    document.querySelector(".sidebar").classList.add("open");
+    document.getElementById("sidebar-overlay").classList.add("show");
+  }
+
+  function closeSidebar(){
+    document.querySelector(".sidebar").classList.remove("open");
+    document.getElementById("sidebar-overlay").classList.remove("show");
+  }
+
+  function openAccountMenu(){
+    var menu = document.getElementById("account-menu");
+    menu.hidden = false;
+    void menu.offsetWidth;
+    menu.classList.add("show");
+    document.getElementById("btn-account").setAttribute("aria-expanded", "true");
+  }
+
+  function closeAccountMenu(){
+    var menu = document.getElementById("account-menu");
+    if (menu.hidden) return;
+    menu.classList.remove("show");
+    document.getElementById("btn-account").setAttribute("aria-expanded", "false");
+    setTimeout(function(){ menu.hidden = true; }, 160);
+  }
+
+  function closeAllRoleMenus(){
+    var menu = document.getElementById("role-menu-portal");
+    menu.hidden = true;
+    Array.prototype.forEach.call(document.querySelectorAll(".role-select[aria-expanded]"), function(b){ b.setAttribute("aria-expanded","false"); });
+  }
+
+  function openRoleMenu(triggerBtn){
+    var memberId = triggerBtn.getAttribute("data-role-toggle");
+    var menu = document.getElementById("role-menu-portal");
+    var wasOpenForThis = !menu.hidden && menu.getAttribute("data-open-for")===memberId;
+
+    closeAllRoleMenus();
+    if (wasOpenForThis) return;
+
+    var member = members.find(function(x){ return x.id==memberId; });
+    menu.innerHTML = ROLES.map(function(r){
+      return '<button type="button" class="role-option'+(member.role===r ? " selected" : "")+'" data-role-option="'+member.id+'" data-role-value="'+esc(r)+'">'+esc(r)+'</button>';
+    }).join("");
+    menu.setAttribute("data-open-for", memberId);
+    menu.hidden = false;
+
+    var rect = triggerBtn.getBoundingClientRect();
+    menu.style.top = (rect.bottom + 6) + "px";
+    var menuWidth = menu.offsetWidth;
+    var left = rect.left;
+    if (left + menuWidth > window.innerWidth - 16) left = Math.max(16, window.innerWidth - 16 - menuWidth);
+    menu.style.left = left + "px";
+
+    triggerBtn.setAttribute("aria-expanded", "true");
+  }
+
+  function closeAllMatchMenus(){
+    var menu = document.getElementById("match-menu-portal");
+    menu.hidden = true;
+    Array.prototype.forEach.call(document.querySelectorAll(".role-select[aria-expanded][data-match-toggle]"), function(b){ b.setAttribute("aria-expanded","false"); });
+  }
+
+  function openMatchMenu(triggerBtn){
+    var txId = triggerBtn.getAttribute("data-match-toggle");
+    var menu = document.getElementById("match-menu-portal");
+    var wasOpenForThis = !menu.hidden && menu.getAttribute("data-open-for")===txId;
+
+    closeAllMatchMenus();
+    if (wasOpenForThis) return;
+
+    var pendingUnpaid = members.filter(function(m){ return m.status==="pending" && m.payment==="Unpaid"; });
+    menu.innerHTML = pendingUnpaid.length
+      ? pendingUnpaid.map(function(m){
+          return '<button type="button" class="role-option" data-match-option="'+txId+'" data-match-value="'+m.id+'">'+esc(m.name)+'</button>';
+        }).join("")
+      : '<div class="role-option role-option-static">'+t("matchNoApplicants")+'</div>';
+    menu.setAttribute("data-open-for", txId);
+    menu.hidden = false;
+
+    var rect = triggerBtn.getBoundingClientRect();
+    menu.style.top = (rect.bottom + 6) + "px";
+    var menuWidth = menu.offsetWidth;
+    var left = rect.left;
+    if (left + menuWidth > window.innerWidth - 16) left = Math.max(16, window.innerWidth - 16 - menuWidth);
+    menu.style.left = left + "px";
+
+    triggerBtn.setAttribute("aria-expanded", "true");
+  }
+
+  // ---------- I18N ----------
+  function applyStaticI18n(){
+    Array.prototype.forEach.call(document.querySelectorAll("[data-i18n]"), function(el){
+      el.textContent = t(el.getAttribute("data-i18n"));
+    });
+    Array.prototype.forEach.call(document.querySelectorAll("[data-i18n-placeholder]"), function(el){
+      el.setAttribute("placeholder", t(el.getAttribute("data-i18n-placeholder")));
+    });
+  }
+
+  function setLanguage(lang){
+    state.lang = lang;
+    Array.prototype.forEach.call(document.querySelectorAll(".lang-btn"), function(btn){
+      btn.classList.toggle("active", btn.getAttribute("data-lang")===lang);
+    });
+    document.getElementById("lang-thumb").classList.toggle("pos-1", lang==="id");
+
+    var shellBody = document.querySelector(".shell-body");
+    shellBody.classList.add("fading");
+    setTimeout(function(){
+      applyStaticI18n();
+      renderAll();
+      tickClock();
+      shellBody.classList.remove("fading");
+    }, 150);
+  }
+
+  function setTheme(theme){
+    document.documentElement.setAttribute("data-theme", theme);
+    Array.prototype.forEach.call(document.querySelectorAll(".theme-btn"), function(btn){
+      btn.classList.toggle("active", btn.getAttribute("data-theme-value")===theme);
+    });
+    document.getElementById("theme-thumb").classList.toggle("pos-1", theme==="light");
+  }
+
+  // ---------- HEADER ----------
+  function renderHeader(){
+    var s = SECTIONS[state.section];
+    var header = document.getElementById("content-header");
+    var addBtn = s.addLabelKey ? '<button class="btn-add" id="btn-add" type="button">'+t(s.addLabelKey)+'</button>' : "";
+    header.innerHTML = '<div><h1>'+t(s.titleKey)+'</h1><p>'+t(s.descKey)+'</p></div>' + addBtn;
+    if (!s.addLabelKey) state.addPanelOpen = false;
+  }
+
+  // ---------- DASHBOARD ----------
+  var STAT_ICONS = {
+    members: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><polyline points="17 11 19 13 23 9"/></svg>',
+    qris: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><line x1="14" y1="14" x2="21" y2="14"/><line x1="14" y1="21" x2="21" y2="21"/><line x1="17.5" y1="14" x2="17.5" y2="21"/></svg>',
+    merch: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>',
+    lora: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>',
+    touring: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>',
+    directory: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>'
+  };
+
+  function animateCountUp(el, toValue, formatFn, duration){
+    if (!el) return;
+    duration = duration || 900;
+    var startTime = null;
+    function tick(ts){
+      if (startTime===null) startTime = ts;
+      var progress = Math.min(1, (ts-startTime)/duration);
+      var eased = 1 - Math.pow(1-progress, 3);
+      el.textContent = formatFn(toValue*eased);
+      if (progress < 1) requestAnimationFrame(tick);
+      else el.textContent = formatFn(toValue);
+    }
+    requestAnimationFrame(tick);
+  }
+
+  function runGrowTick(duration, onFrame){
+    var startTime = null;
+    function tick(ts){
+      if (startTime===null) startTime = ts;
+      var progress = Math.min(1, (ts-startTime)/duration);
+      var eased = 1 - Math.pow(1-progress, 3);
+      onFrame(eased);
+      if (progress < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+
+  function triggerVizGrow(){
+    Array.prototype.forEach.call(document.querySelectorAll("#dashboard-view .viz-grow"), function(el){
+      var fromY = parseFloat(el.getAttribute("y"));
+      var fy = parseFloat(el.getAttribute("data-fy"));
+      var fh = parseFloat(el.getAttribute("data-fh"));
+      var delay = parseFloat(el.getAttribute("data-delay")) || 0;
+      setTimeout(function(){
+        runGrowTick(500, function(eased){
+          el.setAttribute("height", (fh*eased).toFixed(1));
+          el.setAttribute("y", (fromY - (fromY-fy)*eased).toFixed(1));
+        });
+      }, delay);
+    });
+
+    Array.prototype.forEach.call(document.querySelectorAll("#dashboard-view .viz-grow-w"), function(el){
+      var fw = parseFloat(el.getAttribute("data-fw"));
+      var delay = parseFloat(el.getAttribute("data-delay")) || 0;
+      setTimeout(function(){
+        runGrowTick(500, function(eased){ el.style.width = (fw*eased).toFixed(1)+"%"; });
+      }, delay);
+    });
+
+    var growPath = function(el, isFill){
+      var pts = JSON.parse(el.getAttribute("data-pts"));
+      var baseline = parseFloat(el.getAttribute("data-baseline"));
+      runGrowTick(600, function(eased){
+        var framePts = pts.map(function(p){ return { x:p.x, y: baseline + (p.y-baseline)*eased }; });
+        var built = svgPathsFromPoints(framePts, baseline);
+        el.setAttribute("d", isFill ? built.area : built.line);
+      });
+    };
+    Array.prototype.forEach.call(document.querySelectorAll("#dashboard-view .viz-area-grow-fill"), function(el){ growPath(el, true); });
+    Array.prototype.forEach.call(document.querySelectorAll("#dashboard-view .viz-area-grow-line"), function(el){ growPath(el, false); });
+  }
+
+  function runDashboardIntro(m, tiles){
+    triggerVizGrow();
+    var kpiJobs = [
+      { id:"kpi-revenue-value", to:m.revenue.total, fmt:function(v){ return rupiah(v); }, dur:1000 },
+      { id:"kpi-members-value", to:m.members.active, fmt:function(v){ return Math.round(v).toLocaleString(state.lang==="id"?"id-ID":"en-GB"); }, dur:900 },
+      { id:"kpi-pending-value", to:m.members.pending, fmt:function(v){ return Math.round(v); }, dur:700 },
+      { id:"kpi-match-value", to:m.matching.rate*100, fmt:function(v){ return Math.round(v)+"%"; }, dur:900 }
+    ];
+    if (m.reviewHoursMedian!=null){
+      if (m.reviewHoursMedian < 48) kpiJobs.push({ id:"kpi-review-value", to:m.reviewHoursMedian, fmt:function(v){ return t("hours", v.toFixed(1)); }, dur:800 });
+      else kpiJobs.push({ id:"kpi-review-value", to:m.reviewHoursMedian/24, fmt:function(v){ return t("days", v.toFixed(1)); }, dur:800 });
+    }
+    kpiJobs.forEach(function(job, i){
+      setTimeout(function(){ animateCountUp(document.getElementById(job.id), job.to, job.fmt, job.dur); }, i*70);
+    });
+    tiles.forEach(function(tile, i){
+      setTimeout(function(){
+        animateCountUp(document.getElementById("stat-value-"+tile.goto), tile.animValue, function(v){ return Math.round(v)+tile.suffix; }, 650);
+      }, 300 + i*60);
+    });
+  }
+
+  function renderDashboard(){
+    hideVizTooltip();
+    var isIntro = state.dashboardIntroPending;
+    state.dashboardIntroPending = false;
+    var wrap = document.getElementById("dashboard-view");
+    var m = getMetrics(state.dashRange);
+    var grouping = m.bucket==="day" ? t("groupedDaily") : t("groupedWeekly");
+    var reviewTime = m.reviewHoursMedian==null ? "—"
+      : m.reviewHoursMedian < 48 ? t("hours", m.reviewHoursMedian.toFixed(1)) : t("days", (m.reviewHoursMedian/24).toFixed(1));
+
+    var rangeTabsHtml = [7,30,90].map(function(r){
+      return '<button type="button" class="tab'+(m.range===r?" active":"")+'" data-range="'+r+'">'+t("range"+r)+'</button>';
+    }).join("");
+
+    var kpiPopStyle = function(i){ return isIntro ? ' intro-pop" style="animation-delay:'+(i*70)+'ms' : ""; };
+    var kpiRevenueTxt = isIntro ? rupiah(0) : rupiah(m.revenue.total);
+    var kpiMembersTxt = isIntro ? "0" : m.members.active.toLocaleString(state.lang==="id"?"id-ID":"en-GB");
+    var kpiPendingTxt = isIntro ? "0" : m.members.pending;
+    var kpiMatchTxt = isIntro ? "0%" : (m.matching.rate*100).toFixed(0)+"%";
+    var kpiReviewTxt = isIntro ? "—" : reviewTime;
+
+    var kpiHtml = ''
+      + '<div class="kpi hero'+kpiPopStyle(0)+'"><div class="kpi-label">'+t("kpiRevenue")+' · '+t("kpiRevenueSub", m.range)+'</div>'
+      + '<div class="kpi-value" id="kpi-revenue-value">'+kpiRevenueTxt+'</div>'+buildDeltaHtml(m.revenue.total, m.revenue.prevTotal, m.range)+'</div>'
+      + '<div class="kpi'+kpiPopStyle(1)+'"><div class="kpi-label">'+t("kpiMembers")+'</div><div class="kpi-value" id="kpi-members-value">'+kpiMembersTxt+'</div>'
+      + '<div class="kpi-sub">'+t("kpiNewMembers", m.members.approvedInRange)+'</div></div>'
+      + '<div class="kpi'+kpiPopStyle(2)+'"><div class="kpi-label">'+t("kpiPending")+'</div><div class="kpi-value" id="kpi-pending-value">'+kpiPendingTxt+'</div>'
+      + '<div class="kpi-sub">'+t("kpiPendingSub", m.members.pendingUnpaid)+'</div></div>'
+      + '<div class="kpi'+kpiPopStyle(3)+'"><div class="kpi-label">'+t("kpiMatchRate")+'</div><div class="kpi-value" id="kpi-match-value">'+kpiMatchTxt+'</div>'
+      + '<div class="kpi-sub">'+t("kpiMatchRateSub", m.matching.unmatchedOpen)+'</div></div>'
+      + '<div class="kpi'+kpiPopStyle(4)+'"><div class="kpi-label">'+t("kpiApprovalTime")+'</div><div class="kpi-value" id="kpi-review-value">'+kpiReviewTxt+'</div>'
+      + '<div class="kpi-sub">'+t("kpiApprovalTimeSub")+'</div></div>';
+
+    var cardDelay = function(i){ return isIntro ? 350+i*70 : null; };
+
+    chartBuilders = {
+      revenue: function(grow, size){ return buildAreaChartSvg(m.revenue.series, grow, size); },
+      applications: function(grow, size){ return buildStackedBarSvg(m.applications, APP_SERIES, m.bucket, grow, size); },
+      matching: function(grow, size){ return buildStackedBarSvg(m.matching.series, MATCH_SERIES, m.bucket, grow, size); }
+    };
+
+    var revCard = buildCard("revenue", t("chartRevenue"), t("chartRevenueSub"), true,
+      buildAreaChartSvg(m.revenue.series, isIntro),
+      buildMiniTable([t("colDay"), t("colRevenue")], m.revenue.series.slice().reverse().map(function(r){ return [fmtShortDay(r.day), rupiah(r.amount)]; })),
+      null, cardDelay(0));
+
+    var appCard = buildCard("applications", t("chartApplications"), t("chartApplicationsSub")+", "+grouping, false,
+      buildStackedBarSvg(m.applications, APP_SERIES, m.bucket, isIntro),
+      buildMiniTable([m.bucket==="day"?t("colDay"):t("colWeek"), t("seriesApproved"), t("seriesPending"), t("seriesRejected")],
+        m.applications.slice().reverse().map(function(r){ return [bucketLabel(r.bucket, m.bucket), r.approved, r.pending, r.rejected]; })),
+      buildLegend(APP_SERIES), cardDelay(1));
+
+    var matchCard = buildCard("matching", t("chartMatch"), t("chartMatchSub")+", "+grouping, false,
+      buildStackedBarSvg(m.matching.series, MATCH_SERIES, m.bucket, isIntro),
+      buildMiniTable([m.bucket==="day"?t("colDay"):t("colWeek")].concat(MATCH_SERIES.map(function(s){ return t(s.labelKey); })),
+        m.matching.series.slice().reverse().map(function(r){ return [bucketLabel(r.bucket, m.bucket), r.invoice, r.name, r.manual, r.unmatched]; })),
+      buildLegend(MATCH_SERIES), cardDelay(2));
+
+    var commCard = buildCard("community", t("chartCommunity"), t("chartCommunitySub"), false,
+      buildRankedBarsHtml(m.byCommunity, null, isIntro),
+      buildMiniTable([t("colCommunity"), t("colCount")], m.byCommunity.map(function(r){ return [r.label, r.count]; })),
+      null, cardDelay(3));
+
+    var motoCard = buildCard("moto", t("chartMoto"), t("chartMotoSub"), false,
+      buildRankedBarsHtml(m.byMoto, null, isIntro),
+      buildMiniTable([t("colMotorcycle"), t("colCount")], m.byMoto.map(function(r){ return [r.label, r.count]; })),
+      null, cardDelay(4));
+
+    var issuerTotal = m.byIssuer.reduce(function(s,x){ return s+x.count; }, 0) || 1;
+    var issuerCard = buildCard("issuer", t("chartIssuer"), t("chartIssuerSub"), false,
+      buildRankedBarsHtml(m.byIssuer, "var(--series-1)", isIntro),
+      buildMiniTable([t("colIssuer"), t("colCount"), t("colShare")], m.byIssuer.map(function(r){ return [r.label, r.count, Math.round((r.count/issuerTotal)*100)+"%"]; })),
+      null, cardDelay(5));
+
+    var touringPct = touringRoutes.map(function(r){ return { label:r.name, count:riderPct(r.riders) }; });
+    var touringCard = buildCard("touring", t("chartTouring"), t("chartTouringSub"), false,
+      buildRankedBarsHtml(touringPct, "var(--series-2)", isIntro, "%"),
+      buildMiniTable([t("colRoute"), t("colRiders"), t("colShare")], touringRoutes.map(function(r){ return [r.name, r.riders, riderPct(r.riders)+"%"]; })),
+      null, cardDelay(6));
+
+    var rideStatsHtml = '<div class="ride-stats">'
+      + '<div class="ride-stat"><div class="k">'+t("rideTotalKm")+'</div><div class="v">'+fmtNum(RIDING_TOTALS.km)+' km</div></div>'
+      + '<div class="ride-stat"><div class="k">'+t("rideTotalTime")+'</div><div class="v">'+t("hours", fmtNum(RIDING_TOTALS.minutes/60))+'</div></div>'
+      + '<div class="ride-stat"><div class="k">'+t("rideToursDone")+'</div><div class="v">'+RIDING_TOTALS.tours+'</div></div>'
+      + '</div>';
+    var ridersCard = buildCard("riders", t("chartRiders"), t("chartRidersSub"), true,
+      rideStatsHtml + buildRankedBarsHtml(TOP_RIDERS, "var(--series-2)", isIntro, " km", true),
+      buildMiniTable([t("colRider"), t("colDistance")], TOP_RIDERS.map(function(r){ return [r.label, fmtNum(r.count)+" km"]; })),
+      null, cardDelay(7));
+
+    var unmatchedCount = countBy(qrisTransactions,"unmatched");
+    var tiles = [
+      { icon:STAT_ICONS.members, tone:"accent", value:countBy(members,"pending"), animValue:countBy(members,"pending"), suffix:"", labelKey:"statPendingMembers", goto:"members" },
+      { icon:STAT_ICONS.qris, tone:unmatchedCount>0 ? "bad" : "good", value:unmatchedCount, animValue:unmatchedCount, suffix:"", labelKey:"statUnmatchedPayments", goto:"qris" },
+      { icon:STAT_ICONS.merch, tone:"accent", value:countBy(merchOrders,"new"), animValue:countBy(merchOrders,"new"), suffix:"", labelKey:"statNewOrders", goto:"merchandise" },
+      { icon:STAT_ICONS.lora, tone:"good", value:countBy(loraDevices,"online")+"/"+loraDevices.length, animValue:countBy(loraDevices,"online"), suffix:"/"+loraDevices.length, labelKey:"statLoraOnline", goto:"lora" },
+      { icon:STAT_ICONS.touring, tone:"good", value:countBy(touringRoutes,"active"), animValue:countBy(touringRoutes,"active"), suffix:"", labelKey:"statActiveRoutes", goto:"touring" },
+      { icon:STAT_ICONS.directory, tone:"accent", value:countBy(members,"approved"), animValue:countBy(members,"approved"), suffix:"", labelKey:"statApprovedMembers", goto:"directory" }
+    ];
+
+    var tilesHtml = tiles.map(function(tile, i){
+      var cls = "stat-card" + (isIntro ? " intro-pop" : "");
+      var style = isIntro ? ' style="animation-delay:'+(300+i*60)+'ms"' : "";
+      var valTxt = isIntro ? ("0"+tile.suffix) : tile.value;
+      return '<button type="button" class="'+cls+'"'+style+' data-goto="'+tile.goto+'">'
+        + '<div class="stat-icon tone-'+tile.tone+'">'+tile.icon+'</div>'
+        + '<div class="stat-value" id="stat-value-'+tile.goto+'">'+valTxt+'</div>'
+        + '<div class="stat-label">'+t(tile.labelKey)+'</div>'
+        + '</button>';
+    }).join("");
+
+    var recentHtml = auditLog.slice(0,5).map(function(a){
+      var cls = AUDIT_CHIP_CLASS[a.type] || "neutral";
+      var labelKey = AUDIT_CHIP_LABEL[a.type] || "chipAuditEdit";
+      return '<div class="dashboard-activity-row">'
+        + '<span class="chip '+cls+'">'+t(labelKey)+'</span>'
+        + '<div class="dashboard-activity-desc">'+esc(a.desc)+'</div>'
+        + '<div class="cell-sub">'+esc(a.at)+'</div>'
+        + '</div>';
+    }).join("");
+
+    wrap.innerHTML = '<div class="dash-filters"><div class="tabs">'+rangeTabsHtml+'</div></div>'
+      + '<div class="kpi-grid">'+kpiHtml+'</div>'
+      + '<div class="chart-grid">'+revCard+appCard+matchCard+commCard+motoCard+issuerCard+touringCard+ridersCard+'</div>'
+      + '<div class="dashboard-grid">'+tilesHtml+'</div>'
+      + '<div class="dashboard-activity">'
+      + '<div class="dashboard-activity-head"><h2>'+t("dashboardActivityTitle")+'</h2>'
+      + '<button type="button" class="dashboard-view-all" data-goto="auditlog">'+t("dashboardViewAll")+'</button></div>'
+      + recentHtml
+      + '</div>';
+
+    fitCharts(isIntro);
+    if (isIntro) runDashboardIntro(m, tiles);
+  }
+
+  // ---------- MEMBER REVIEW ----------
+  function renderMemberTabs(){
+    var wrap = document.getElementById("tabs");
+    Array.prototype.forEach.call(wrap.querySelectorAll(".tab"), function(el){ el.remove(); });
+    MEMBER_TABS.forEach(function(tb){
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "tab" + (state.memberTab===tb.key ? " active" : "");
+      btn.innerHTML = t(tb.labelKey) + ' <span class="count">(' + countBy(members,tb.key) + ')</span>';
+      btn.addEventListener("click", function(){
+        state.memberTab = tb.key; state.openDetail=null; state.openReject=null; render();
+      });
+      wrap.appendChild(btn);
+    });
+    updateTabThumb();
+  }
+
+  function renderMemberHead(){
+    var thead = document.getElementById("thead");
+    var cols = [t("colName"), t("colMotorcycle"), t("colCommunity"), t("colPayment")];
+    if (state.memberTab==="pending") cols.push(t("colAction"));
+    else if (state.memberTab==="approved") cols.push(t("colKodeKomunitas"));
+    else cols.push(t("colReason"));
+    thead.innerHTML = "<tr>" + cols.map(function(c){ return "<th>"+c+"</th>"; }).join("") + "</tr>";
+  }
+
+  function matchesMember(m){
+    if (!state.query) return true;
+    var q = state.query.toLowerCase();
+    return m.name.toLowerCase().indexOf(q)>-1 || m.community.toLowerCase().indexOf(q)>-1 || m.moto.toLowerCase().indexOf(q)>-1;
+  }
+
+  function paymentChip(m){
+    return m.payment==="Paid"
+      ? '<span class="chip good">'+t("chipPaid")+'</span>'
+      : '<span class="chip bad">'+t("chipUnpaid")+'</span>';
+  }
+
+  function renderMemberBody(){
+    var tbody = document.getElementById("tbody");
+    var rows = members.filter(function(m){ return m.status===state.memberTab && matchesMember(m); });
+
+    if (!rows.length){
+      var tabLabel = t(MEMBER_TABS.filter(function(tb){ return tb.key===state.memberTab; })[0].labelKey).toLowerCase();
+      var querySuffix = state.query ? t("emptyQuerySuffix", esc(state.query)) : "";
+      tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state">' + t("emptyMembers", tabLabel, querySuffix) + '</div></td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = rows.map(function(m){
+      var html = "";
+      html += '<tr class="data-row" data-id="'+m.id+'">';
+      html += '<td><div class="cell-name">'+esc(m.name)+'</div><div class="cell-sub">'+esc(m.community)+' &middot; joined '+(m.submitted||m.decidedOn)+'</div></td>';
+      html += '<td data-label="'+t("colMotorcycle")+'">'+esc(m.moto)+'</td>';
+      html += '<td data-label="'+t("colCommunity")+'">'+esc(m.community)+'</td>';
+      html += '<td data-label="'+t("colPayment")+'">'+paymentChip(m)+'</td>';
+
+      if (m.status==="pending"){
+        html += '<td data-label="'+t("colAction")+'"><div class="row-actions">'
+          + '<button class="btn-approve" data-approve="'+m.id+'">'+t("btnApprove")+'</button>'
+          + '<button class="btn-reject" data-reject="'+m.id+'">'+t("btnReject")+'</button>'
+          + '</div></td>';
+      } else if (m.status==="approved"){
+        html += '<td data-label="'+t("colKodeKomunitas")+'"><div class="code-line"><span class="dot"></span>'+m.code+'</div></td>';
+      } else {
+        var reasonShort = m.reason && m.reason.length > 42 ? m.reason.slice(0,42)+"…" : m.reason;
+        html += '<td data-label="'+t("colReason")+'"><span class="cell-sub" style="color:var(--bad-text); font-weight:600;">'+esc(reasonShort||"")+'</span></td>';
+      }
+      html += '</tr>';
+
+      if (state.openDetail===m.id){
+        var detailFields = m.status==="rejected"
+          ? field(t("fieldReasonSent"), m.reason) + field(t("fieldDecidedOn"), m.decidedOn)
+          : field(t("fieldPhone"), m.phone)
+            + field(t("fieldPlate"), m.plate)
+            + field(t("fieldSubmitted"), m.submitted)
+            + field(t("fieldPatchFee"), m.payment==="Paid" ? t("chipPaid") : t("valAwaitingProof"))
+            + field(t("fieldKtaFee"), m.payment==="Paid" ? t("chipPaid") : t("valAwaitingProof"))
+            + field(t("fieldCoc"), m.coc ? t("valAgreed") : t("valNotAgreed"));
+        html += '<tr class="detail-row"><td colspan="5"><div class="detail-inner">' + detailFields + '</div></td></tr>';
+      }
+
+      if (state.openReject===m.id){
+        html += '<tr class="detail-row"><td colspan="5"><div class="reject-panel">'
+          + '<label for="reject-reason">'+t("rejectLabel")+'</label>'
+          + '<textarea id="reject-reason" placeholder="e.g. Payment proof unreadable, please resubmit"></textarea>'
+          + '<div class="actions">'
+          + '<button class="btn-confirm-reject" data-confirm-reject="'+m.id+'">'+t("btnConfirmReject")+'</button>'
+          + '<button class="btn-cancel" data-cancel-reject="'+m.id+'">'+t("btnCancel")+'</button>'
+          + '</div></div></td></tr>';
+      }
+
+      return html;
+    }).join("");
+  }
+
+  // ---------- MEMBER DIRECTORY ----------
+  function matchesDirectory(m){
+    if (!state.query) return true;
+    var q = state.query.toLowerCase();
+    return m.name.toLowerCase().indexOf(q)>-1 || m.community.toLowerCase().indexOf(q)>-1 || (m.role||"").toLowerCase().indexOf(q)>-1;
+  }
+
+  function renderDirectoryTable(){
+    var thead = document.getElementById("thead");
+    thead.innerHTML = "<tr><th>"+t("colName")+"</th><th>"+t("colMotorcycle")+"</th><th>"+t("colCommunity")+"</th><th>"+t("colKodeKomunitas")+"</th><th>"+t("colRole")+"</th></tr>";
+    var tbody = document.getElementById("tbody");
+
+    var rows = members.filter(function(m){ return m.status==="approved" && matchesDirectory(m); });
+
+    if (!rows.length){
+      var querySuffix = state.query ? t("emptyQuerySuffix", esc(state.query)) : "";
+      tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state">' + t("emptyDirectory", querySuffix) + '</div></td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = rows.map(function(m){
+      var html = '<tr class="data-row" data-id="'+m.id+'">'
+        + '<td class="cell-name">'+esc(m.name)+'</td>'
+        + '<td data-label="'+t("colMotorcycle")+'">'+esc(m.moto)+'</td>'
+        + '<td data-label="'+t("colCommunity")+'">'+esc(m.community)+'</td>'
+        + '<td data-label="'+t("colKodeKomunitas")+'"><div class="code-line"><span class="dot"></span>'+esc(m.code)+'</div></td>'
+        + '<td data-label="'+t("colRole")+'"><button type="button" class="role-select" data-role-toggle="'+m.id+'"><span>'+esc(m.role||"")+'</span>'
+          + '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>'
+          + '</button></td>'
+        + '</tr>';
+      if (state.openDetail===m.id){
+        html += '<tr class="detail-row"><td colspan="5">'+buildProfileDetail(m)+'</td></tr>';
+      }
+      return html;
+    }).join("");
+  }
+
+  // Members approved from the review queue have no garage yet — seed it from their application.
+  function garageOf(m){
+    return m.garage || { motors:[{ name:m.moto, plate:m.plate||"—", color:"" }], helmets:[] };
+  }
+
+  function buildProfileDetail(m){
+    var stats = m.stats || { km:0, minutes:0, tours:0 };
+    var garage = garageOf(m);
+
+    var motorsHtml = garage.motors.length
+      ? '<div class="garage-grid">' + garage.motors.map(function(v){
+          return '<div class="garage-card"><div class="item-thumb">'+ITEM_ICONS.moto+'</div><div>'
+            + '<div class="garage-name">'+esc(v.name)+'</div>'
+            + '<div class="garage-plate">'+esc(v.plate)+'</div>'
+            + (v.color ? '<div class="cell-sub">'+esc(v.color)+'</div>' : '')
+            + '</div></div>';
+        }).join("") + '</div>'
+      : '<div class="garage-empty">'+t("garageNoMotors")+'</div>';
+
+    var helmetsHtml = garage.helmets.length
+      ? '<div class="garage-grid">' + garage.helmets.map(function(h){
+          return '<div class="garage-card"><div class="item-thumb">'+ITEM_ICONS.helmet+'</div><div>'
+            + '<div class="garage-name">'+esc(h.name)+'</div>'
+            + '<div class="cell-sub">'+t("helmetSize", esc(h.size))+'</div>'
+            + '</div></div>';
+        }).join("") + '</div>'
+      : '<div class="garage-empty">'+t("garageNoHelmets")+'</div>';
+
+    return '<div class="profile-detail">'
+      + '<div class="detail-grid">'
+        + field(t("fieldEmail"), m.email || "—")
+        + field(t("fieldPhone"), m.phone || "—")
+        + field(t("fieldLocation"), m.location || m.community)
+        + field(t("fieldBirthDate"), m.birthDate || "—")
+        + field(t("fieldJob"), m.job || "—")
+        + field(t("fieldMemberSince"), m.decidedOn || "—")
+      + '</div>'
+      + '<div class="detail-grid">'
+        + field(t("fieldDistance"), fmtNum(stats.km)+" km")
+        + field(t("fieldRideTime"), fmtDuration(stats.minutes))
+        + field(t("fieldToursDone"), stats.tours)
+      + '</div>'
+      + '<div><div class="detail-section-title">'+t("garageTitle")+' · '+t("garageMotors")+'</div>'+motorsHtml+'</div>'
+      + '<div><div class="detail-section-title">'+t("garageTitle")+' · '+t("garageHelmets")+'</div>'+helmetsHtml+'</div>'
+      + '</div>';
+  }
+
+  // ---------- MERCHANDISE ----------
+  var ORDER_FLOW = {
+    "new":      { chip:"neutral", labelKey:"chipNewOrder", next:"processing", btnKey:"btnProcess" },
+    processing: { chip:"neutral", labelKey:"chipProcessing", next:"shipped", btnKey:"btnMarkShipped" },
+    shipped:    { chip:"good", labelKey:"chipShipped", next:"done", btnKey:"btnMarkDone" },
+    done:       { chip:"good", labelKey:"chipDone" }
+  };
+
+  function renderMerchTabs(){
+    renderTabStrip(MERCH_TABS, state.merchTab,
+      function(key){ return key==="products" ? merchandise.length : merchOrders.length; },
+      function(key){ state.merchTab = key; state.openDetail=null; render(); });
+  }
+
+  function matchesProduct(p){
+    if (!state.query) return true;
+    var q = state.query.toLowerCase();
+    return p.name.toLowerCase().indexOf(q)>-1 || p.category.toLowerCase().indexOf(q)>-1;
+  }
+
+  function matchesOrder(o){
+    if (!state.query) return true;
+    var q = state.query.toLowerCase();
+    return o.orderNo.toLowerCase().indexOf(q)>-1 || o.buyer.toLowerCase().indexOf(q)>-1 || o.items.toLowerCase().indexOf(q)>-1;
+  }
+
+  function productChip(p){
+    if (p.status==="hidden") return '<span class="chip plain">'+t("chipHidden")+'</span>';
+    if (p.stock<=0) return '<span class="chip bad">'+t("chipSoldOut")+'</span>';
+    return '<span class="chip good">'+t("chipLiveInApp")+'</span>';
+  }
+
+  function renderMerchTable(){
+    if (state.merchTab==="orders") renderOrdersTable();
+    else renderProductsTable();
+  }
+
+  function renderProductsTable(){
+    var thead = document.getElementById("thead");
+    thead.innerHTML = "<tr><th>"+t("colProduct")+"</th><th>"+t("colPrice")+"</th><th>"+t("colStock")+"</th><th>"+t("colStatus")+"</th><th>"+t("colAction")+"</th></tr>";
+    var tbody = document.getElementById("tbody");
+    var rows = merchandise.filter(matchesProduct);
+
+    if (!rows.length){
+      var querySuffix = state.query ? t("emptyQuerySuffix", esc(state.query)) : "";
+      tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state">' + t("emptyProducts", querySuffix) + '</div></td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = rows.map(function(p){
+      var html = '<tr class="data-row" data-id="'+p.id+'">';
+      html += '<td><div class="cell-item"><div class="item-thumb">'+(ITEM_ICONS[p.icon]||ITEM_ICONS["default"])+'</div><div><div class="cell-name">'+esc(p.name)+'</div><div class="cell-sub">'+esc(p.category)+' &middot; '+fmtNum(p.sold)+' '+t("colSold").toLowerCase()+'</div></div></div></td>';
+      html += '<td data-label="'+t("colPrice")+'">'+esc(rupiah(p.price))+'</td>';
+      html += '<td data-label="'+t("colStock")+'">'+fmtNum(p.stock)+'</td>';
+      html += '<td data-label="'+t("colStatus")+'">'+productChip(p)+'</td>';
+      html += '<td data-label="'+t("colAction")+'"><div class="row-actions">'
+        + (p.status==="hidden"
+            ? '<button class="btn-activate" data-merch-show="'+p.id+'">'+t("btnShowInApp")+'</button>'
+            : '<button class="btn-delete" data-merch-hide="'+p.id+'">'+t("btnHide")+'</button>')
+        + '<button class="btn-delete" data-merch-remove="'+p.id+'">'+t("btnRemove")+'</button>'
+        + '</div></td>';
+      html += '</tr>';
+
+      if (state.openDetail===p.id){
+        html += '<tr class="detail-row"><td colspan="5"><div class="detail-inner">'
+          + field(t("fieldCategory"), p.category)
+          + field(t("fieldPrice"), rupiah(p.price))
+          + field(t("fieldStock"), fmtNum(p.stock))
+          + field(t("fieldSold"), fmtNum(p.sold))
+          + field(t("fieldDescription"), p.desc, true)
+          + '</div></td></tr>';
+      }
+      return html;
+    }).join("");
+  }
+
+  function renderOrdersTable(){
+    var thead = document.getElementById("thead");
+    thead.innerHTML = "<tr><th>"+t("colOrder")+"</th><th>"+t("colBuyer")+"</th><th>"+t("colTotal")+"</th><th>"+t("colStatus")+"</th><th>"+t("colAction")+"</th></tr>";
+    var tbody = document.getElementById("tbody");
+    var rows = merchOrders.filter(matchesOrder);
+
+    if (!rows.length){
+      var querySuffix = state.query ? t("emptyQuerySuffix", esc(state.query)) : "";
+      tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state">' + t("emptyOrders", querySuffix) + '</div></td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = rows.map(function(o){
+      var flow = ORDER_FLOW[o.status];
+      var html = '<tr class="data-row" data-id="'+o.id+'">';
+      html += '<td><div class="cell-name">'+esc(o.orderNo)+'</div><div class="cell-sub">'+esc(o.items)+'</div></td>';
+      html += '<td data-label="'+t("colBuyer")+'">'+esc(o.buyer)+'</td>';
+      html += '<td data-label="'+t("colTotal")+'">'+esc(rupiah(o.total))+'</td>';
+      html += '<td data-label="'+t("colStatus")+'"><span class="chip '+flow.chip+'">'+t(flow.labelKey)+'</span></td>';
+      html += '<td data-label="'+t("colAction")+'">'
+        + (flow.next ? '<button class="btn-activate" data-order-advance="'+o.id+'">'+t(flow.btnKey)+'</button>' : '<span class="dash">—</span>')
+        + '</td>';
+      html += '</tr>';
+
+      if (state.openDetail===o.id){
+        html += '<tr class="detail-row"><td colspan="5"><div class="detail-inner">'
+          + field(t("fieldBuyer"), o.buyer)
+          + field(t("fieldPhone"), o.phone)
+          + field(t("fieldOrderedOn"), o.placedOn)
+          + field(t("fieldItems"), o.items, true)
+          + field(t("fieldShipTo"), o.shipTo, true)
+          + '</div></td></tr>';
+      }
+      return html;
+    }).join("");
+  }
+
+  // ---------- QRIS MONITORING ----------
+  function renderQrisTabs(){
+    var wrap = document.getElementById("tabs");
+    Array.prototype.forEach.call(wrap.querySelectorAll(".tab"), function(el){ el.remove(); });
+    QRIS_TABS.forEach(function(tb){
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "tab" + (state.qrisTab===tb.key ? " active" : "");
+      btn.innerHTML = t(tb.labelKey) + ' <span class="count">(' + countBy(qrisTransactions,tb.key) + ')</span>';
+      btn.addEventListener("click", function(){
+        state.qrisTab = tb.key; render();
+      });
+      wrap.appendChild(btn);
+    });
+    updateTabThumb();
+  }
+
+  function renderQrisHead(){
+    var thead = document.getElementById("thead");
+    var cols = [t("colPayer"), t("colAmount"), t("colReference"), t("colReceived")];
+    cols.push(state.qrisTab==="unmatched" ? t("colAction") : t("colStatus"));
+    thead.innerHTML = "<tr>" + cols.map(function(c){ return "<th>"+c+"</th>"; }).join("") + "</tr>";
+  }
+
+  function matchesQris(tx){
+    if (!state.query) return true;
+    var q = state.query.toLowerCase();
+    return tx.payer.toLowerCase().indexOf(q)>-1 || tx.reference.toLowerCase().indexOf(q)>-1;
+  }
+
+  function renderQrisBody(){
+    var tbody = document.getElementById("tbody");
+    var rows = qrisTransactions.filter(function(tx){ return tx.status===state.qrisTab && matchesQris(tx); });
+
+    if (!rows.length){
+      var tabLabel = t(QRIS_TABS.filter(function(tb){ return tb.key===state.qrisTab; })[0].labelKey).toLowerCase();
+      var querySuffix = state.query ? t("emptyQuerySuffix", esc(state.query)) : "";
+      tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state">' + t("emptyTransactions", tabLabel, querySuffix) + '</div></td></tr>';
+      return;
+    }
+
+    var coinIcon = '<span class="qris-coin"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="6" x2="12" y2="18"/><path d="M15.5 9H10a2 2 0 0 0 0 4h4a2 2 0 0 1 0 4H8"/></svg></span>';
+
+    tbody.innerHTML = rows.map(function(tx){
+      var html = "";
+      var justMatched = justMatchedIds.indexOf(tx.id) > -1;
+      html += '<tr>';
+      html += '<td class="cell-name">'+esc(tx.payer)+'</td>';
+      html += '<td data-label="'+t("colAmount")+'">'+esc(tx.amount)+'</td>';
+      html += '<td data-label="'+t("colReference")+'">'+esc(tx.reference)+'</td>';
+      html += '<td data-label="'+t("colReceived")+'">'+esc(tx.receivedAt)+'</td>';
+
+      if (tx.status==="unmatched"){
+        html += '<td data-label="'+t("colAction")+'"><button type="button" class="role-select" data-match-toggle="'+tx.id+'"><span>'+t("matchSelectPlaceholder")+'</span>'
+          + '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>'
+          + '</button></td>';
+      } else {
+        html += '<td data-label="'+t("colStatus")+'"><span class="chip good">'+t("chipMatchedPrefix")+esc(tx.matchedTo)+'</span>'+(justMatched ? coinIcon : '')+'</td>';
+      }
+
+      html += '</tr>';
+      return html;
+    }).join("");
+
+    if (state.qrisTab==="matched" && justMatchedIds.length){
+      justMatchedIds = [];
+    }
+  }
+
+  // ---------- ANNOUNCEMENTS ----------
+  function renderAnnouncementsTable(){
+    var thead = document.getElementById("thead");
+    thead.innerHTML = "<tr><th>"+t("colTitle")+"</th><th>"+t("colDescription")+"</th><th>"+t("colPosted")+"</th><th>"+t("colAction")+"</th></tr>";
+    var tbody = document.getElementById("tbody");
+
+    if (!announcements.length){
+      tbody.innerHTML = '<tr><td colspan="4"><div class="empty-state">' + t("emptyAnnouncements") + '</div></td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = announcements.map(function(a){
+      return '<tr>'
+        + '<td class="cell-name">'+esc(a.title)+'</td>'
+        + '<td class="cell-body" data-label="'+t("colDescription")+'">'+esc(a.body)+'</td>'
+        + '<td data-label="'+t("colPosted")+'">'+dateTimeCell(a.postedOn, a.time)+'</td>'
+        + '<td data-label="'+t("colAction")+'"><button class="btn-delete" data-delete-announcement="'+a.id+'">'+t("btnRemove")+'</button></td>'
+        + '</tr>';
+    }).join("");
+  }
+
+  // ---------- AGENDA ----------
+  function renderAgendaTable(){
+    var thead = document.getElementById("thead");
+    thead.innerHTML = "<tr><th>"+t("colTitle")+"</th><th>"+t("colDateTime")+"</th><th>"+t("colLocation")+"</th><th>"+t("colAction")+"</th></tr>";
+    var tbody = document.getElementById("tbody");
+
+    if (!agenda.length){
+      tbody.innerHTML = '<tr><td colspan="4"><div class="empty-state">' + t("emptyAgenda") + '</div></td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = agenda.map(function(a){
+      return '<tr>'
+        + '<td><div class="cell-name">'+esc(a.title)+'</div><div class="cell-sub">'+esc(a.note||"")+'</div></td>'
+        + '<td data-label="'+t("colDateTime")+'">'+dateTimeCell(a.date, a.time)+'</td>'
+        + '<td data-label="'+t("colLocation")+'">'+esc(a.location)+'</td>'
+        + '<td data-label="'+t("colAction")+'"><button class="btn-delete" data-delete-agenda="'+a.id+'">'+t("btnRemove")+'</button></td>'
+        + '</tr>';
+    }).join("");
+  }
+
+  // ---------- TOURING ROUTES ----------
+  function isRouteInTab(r, tab){ return tab==="completed" ? r.status==="completed" : r.status!=="completed"; }
+
+  function renderTouringTabs(){
+    renderTabStrip(TOURING_TABS, state.touringTab,
+      function(key){ return touringRoutes.filter(function(r){ return isRouteInTab(r, key); }).length; },
+      function(key){ state.touringTab = key; state.openDetail=null; render(); });
+  }
+
+  function matchesTouring(r){
+    if (!state.query) return true;
+    var q = state.query.toLowerCase();
+    return r.name.toLowerCase().indexOf(q)>-1 || r.waypoints.toLowerCase().indexOf(q)>-1;
+  }
+
+  function buildParticipantsDetail(r){
+    var people = r.participants || [];
+    var list = people.map(function(p){
+      return '<div class="person"><div class="avatar">'+initialOf(p.name)+'</div>'
+        + '<div class="person-main"><div class="cell-name">'+esc(p.name)+'</div><div class="cell-sub">'+esc(p.moto)+(p.color ? ' &middot; '+esc(p.color) : '')+'</div></div>'
+        + (p.lead ? '<span class="chip lead">'+t("chipLeader")+'</span>' : '<span class="chip plain">'+t("chipMember")+'</span>')
+        + '</div>';
+    }).join("");
+    return '<div class="profile-detail"><div>'
+      + '<div class="detail-section-title">'+t("participantsTitle")+'</div>'
+      + (people.length ? '<div class="people-list">'+list+'</div>' : '')
+      + '<div class="people-more">'+t("participantsShowing", people.length, r.riders)+'</div>'
+      + '</div>'
+      + '<div class="detail-grid">'+field(t("fieldWaypoints"), r.waypoints, true)+'</div>'
+      + '</div>';
+  }
+
+  function renderTouringTable(){
+    var done = state.touringTab==="completed";
+    var thead = document.getElementById("thead");
+    thead.innerHTML = done
+      ? "<tr><th>"+t("colRoute")+"</th><th>"+t("colDateTime")+"</th><th>"+t("colDistance")+"</th><th>"+t("colDuration")+"</th><th>"+t("colAction")+"</th></tr>"
+      : "<tr><th>"+t("colRoute")+"</th><th>"+t("colWaypoints")+"</th><th>"+t("colScheduled")+"</th><th>"+t("colStatus")+"</th><th>"+t("colAction")+"</th></tr>";
+    var tbody = document.getElementById("tbody");
+    var rows = touringRoutes.filter(function(r){ return isRouteInTab(r, state.touringTab) && matchesTouring(r); });
+
+    if (!rows.length){
+      var querySuffix = state.query ? t("emptyQuerySuffix", esc(state.query)) : "";
+      tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state">' + t(done ? "emptyTouringDone" : "emptyTouringUpcoming", querySuffix) + '</div></td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = rows.map(function(r){
+      var nameCell = '<td><div class="cell-name">'+esc(r.name)+'</div><div class="cell-sub">'+r.riders+' '+t("colRiders").toLowerCase()+' &middot; '+riderPct(r.riders)+'%</div></td>';
+      var removeBtn = '<button class="btn-delete" data-delete-route="'+r.id+'">'+t("btnRemove")+'</button>';
+      var html = '<tr class="data-row" data-id="'+r.id+'">' + nameCell;
+
+      if (done){
+        html += '<td data-label="'+t("colDateTime")+'">'+dateTimeCell(r.scheduledFor, r.time)+'</td>'
+          + '<td data-label="'+t("colDistance")+'">'+fmtNum(r.distanceKm)+' km</td>'
+          + '<td data-label="'+t("colDuration")+'">'+fmtDuration(r.durationMin)+'</td>'
+          + '<td data-label="'+t("colAction")+'"><div class="row-actions">'+removeBtn+'</div></td>';
+      } else {
+        var statusChip = r.status==="active"
+          ? '<span class="chip good">'+t("chipActive")+'</span>'
+          : '<span class="chip neutral">'+t("chipInactive")+'</span>';
+        var actionBtn = r.status==="active"
+          ? '<button class="btn-delete" data-deactivate="'+r.id+'">'+t("btnDeactivate")+'</button>'
+          : '<button class="btn-activate" data-activate="'+r.id+'">'+t("btnActivate")+'</button>';
+        html += '<td class="cell-sub" data-label="'+t("colWaypoints")+'">'+esc(r.waypoints)+'</td>'
+          + '<td data-label="'+t("colScheduled")+'">'+dateTimeCell(r.scheduledFor, r.time)+'</td>'
+          + '<td data-label="'+t("colStatus")+'">'+statusChip+'</td>'
+          + '<td data-label="'+t("colAction")+'"><div class="row-actions">'+actionBtn+removeBtn+'</div></td>';
+      }
+      html += '</tr>';
+
+      if (state.openDetail===r.id){
+        html += '<tr class="detail-row"><td colspan="5">'+buildParticipantsDetail(r)+'</td></tr>';
+      }
+      return html;
+    }).join("");
+  }
+
+  function renderTouringAll(){
+    renderTouringTabs();
+    renderTouringTable();
+  }
+
+  // ---------- LORA DEVICES ----------
+  function matchesLora(d){
+    if (!state.query) return true;
+    var q = state.query.toLowerCase();
+    return d.owner.toLowerCase().indexOf(q)>-1 || d.model.toLowerCase().indexOf(q)>-1 || d.deviceId.toLowerCase().indexOf(q)>-1;
+  }
+
+  function renderLoraTable(){
+    var thead = document.getElementById("thead");
+    thead.innerHTML = "<tr><th>"+t("colDevice")+"</th><th>"+t("colOwner")+"</th><th>"+t("colLastSeen")+"</th><th>"+t("colStatus")+"</th><th>"+t("colAction")+"</th></tr>";
+    var tbody = document.getElementById("tbody");
+
+    var rows = loraDevices.filter(matchesLora);
+
+    if (!rows.length){
+      var querySuffix = state.query ? t("emptyQuerySuffix", esc(state.query)) : "";
+      tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state">' + t("emptyLora", querySuffix) + '</div></td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = rows.map(function(d){
+      var statusChip = d.status==="online"
+        ? '<span class="chip good">'+t("chipOnline")+'</span>'
+        : '<span class="chip neutral">'+t("chipOffline")+'</span>';
+      var html = "";
+      html += '<tr class="data-row" data-id="'+d.id+'">';
+      html += '<td><div class="cell-name">'+esc(d.model)+'</div><div class="cell-sub">'+esc(d.deviceId)+' &middot; '+d.battery+'%</div></td>';
+      html += '<td data-label="'+t("colOwner")+'">'+esc(d.owner)+'</td>';
+      html += '<td data-label="'+t("colLastSeen")+'">'+esc(d.lastSeen)+'</td>';
+      html += '<td data-label="'+t("colStatus")+'">'+statusChip+'</td>';
+      html += '<td data-label="'+t("colAction")+'"><div class="row-actions"><button class="btn-delete" data-unpair="'+d.id+'">'+t("btnUnpair")+'</button></div></td>';
+      html += '</tr>';
+
+      if (state.openDetail===d.id){
+        html += '<tr class="detail-row"><td colspan="5"><div class="detail-inner">'
+          + field(t("fieldDeviceId"), d.deviceId)
+          + field(t("fieldOwner"), d.owner)
+          + field(t("fieldFirmware"), d.firmware)
+          + field(t("fieldBattery"), d.battery+"%")
+          + field(t("fieldLastSeen"), d.lastSeen)
+          + '</div></td></tr>';
+      }
+
+      return html;
+    }).join("");
+  }
+
+  // ---------- AUDIT LOG ----------
+  var AUDIT_CHIP_CLASS = { approve:"good", reject:"bad", edit:"neutral", create:"neutral" };
+  var AUDIT_CHIP_LABEL = { approve:"chipAuditApprove", reject:"chipAuditReject", edit:"chipAuditEdit", create:"chipAuditCreate" };
+
+  function matchesAuditLog(a){
+    if (!state.query) return true;
+    var q = state.query.toLowerCase();
+    return a.admin.toLowerCase().indexOf(q)>-1 || a.desc.toLowerCase().indexOf(q)>-1;
+  }
+
+  function renderAuditLogTable(){
+    var thead = document.getElementById("thead");
+    thead.innerHTML = "<tr><th>"+t("colTimestamp")+"</th><th>"+t("colAdmin")+"</th><th>"+t("colActivity")+"</th></tr>";
+    var tbody = document.getElementById("tbody");
+
+    var rows = auditLog.filter(matchesAuditLog);
+
+    if (!rows.length){
+      var querySuffix = state.query ? t("emptyQuerySuffix", esc(state.query)) : "";
+      tbody.innerHTML = '<tr><td colspan="3"><div class="empty-state">' + t("emptyAuditLog", querySuffix) + '</div></td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = rows.map(function(a){
+      var cls = AUDIT_CHIP_CLASS[a.type] || "neutral";
+      var labelKey = AUDIT_CHIP_LABEL[a.type] || "chipAuditEdit";
+      return '<tr>'
+        + '<td class="cell-sub" data-label="'+t("colTimestamp")+'">'+esc(a.at)+'</td>'
+        + '<td data-label="'+t("colAdmin")+'">'+esc(a.admin)+'</td>'
+        + '<td data-label="'+t("colActivity")+'"><span class="chip '+cls+'">'+t(labelKey)+'</span><div class="cell-sub">'+esc(a.desc)+'</div></td>'
+        + '</tr>';
+    }).join("");
+  }
+
+  // ---------- ADD PANEL ----------
+  function renderAddPanel(){
+    var wrap = document.getElementById("add-panel");
+    if (!state.addPanelOpen || !SECTIONS[state.section].addLabelKey){
+      wrap.innerHTML = "";
+      return;
+    }
+
+    if (state.section==="announcements"){
+      wrap.innerHTML = '<div class="add-panel">'
+        + '<div class="fields">'
+        + '<label>'+t("fieldTitle")+'<input type="text" id="new-title" placeholder="e.g. Touring Bandung — 12 Okt 2026"></label>'
+        + '<label>'+t("fieldPostTime")+'<input type="time" id="new-time" value="'+nowHHMM()+'"></label>'
+        + '</div>'
+        + '<label>'+t("fieldDescription")+'<textarea id="new-body" placeholder="Announcement details shown to members"></textarea></label>'
+        + '<div class="actions">'
+        + '<button class="btn-save" id="btn-save">'+t("btnPostAnnouncement")+'</button>'
+        + '<button class="btn-cancel" id="btn-cancel-add">'+t("btnCancel")+'</button>'
+        + '</div></div>';
+    } else if (state.section==="agenda"){
+      wrap.innerHTML = '<div class="add-panel">'
+        + '<div class="fields">'
+        + '<label>'+t("fieldTitle")+'<input type="text" id="new-title" placeholder="e.g. Kopdar Bulanan"></label>'
+        + '<label>'+t("fieldDate")+'<input type="text" id="new-date" placeholder="e.g. 28 Sep 2026"></label>'
+        + '<label>'+t("fieldTime")+'<input type="time" id="new-time"></label>'
+        + '<label>'+t("fieldLocation")+'<input type="text" id="new-location" placeholder="e.g. Warung Kopi RE, Kemang"></label>'
+        + '</div>'
+        + '<label>'+t("fieldNote")+'<textarea id="new-note" placeholder="Extra details for members"></textarea></label>'
+        + '<div class="actions">'
+        + '<button class="btn-save" id="btn-save">'+t("btnAddToAgenda")+'</button>'
+        + '<button class="btn-cancel" id="btn-cancel-add">'+t("btnCancel")+'</button>'
+        + '</div></div>';
+    } else if (state.section==="touring"){
+      wrap.innerHTML = '<div class="add-panel">'
+        + '<div class="fields">'
+        + '<label>'+t("fieldRouteName")+'<input type="text" id="new-title" placeholder="e.g. Jakarta – Bandung via Puncak"></label>'
+        + '<label>'+t("fieldScheduledFor")+'<input type="text" id="new-date" placeholder="e.g. 12 Okt 2026"></label>'
+        + '<label>'+t("fieldDepartTime")+'<input type="time" id="new-time"></label>'
+        + '</div>'
+        + '<label>'+t("fieldWaypoints")+'<textarea id="new-note" placeholder="e.g. Jakarta Selatan → Puncak → Cianjur → Bandung"></textarea></label>'
+        + '<div class="actions">'
+        + '<button class="btn-save" id="btn-save">'+t("btnAddRouteSubmit")+'</button>'
+        + '<button class="btn-cancel" id="btn-cancel-add">'+t("btnCancel")+'</button>'
+        + '</div></div>';
+    } else if (state.section==="merchandise"){
+      wrap.innerHTML = '<div class="add-panel">'
+        + '<div class="fields">'
+        + '<label>'+t("fieldProductName")+'<input type="text" id="new-title" placeholder="e.g. Hoodie RRI Jakarta"></label>'
+        + '<label>'+t("fieldCategory")+'<input type="text" id="new-category" placeholder="e.g. Apparel"></label>'
+        + '<label>'+t("fieldPrice")+'<input type="text" inputmode="numeric" id="new-price" placeholder="e.g. 250000"></label>'
+        + '<label>'+t("fieldStock")+'<input type="text" inputmode="numeric" id="new-stock" placeholder="e.g. 25"></label>'
+        + '</div>'
+        + '<label>'+t("fieldDescription")+'<textarea id="new-note" placeholder="Material, sizes, anything members should know"></textarea></label>'
+        + '<div class="actions">'
+        + '<button class="btn-save" id="btn-save">'+t("btnAddProduct")+'</button>'
+        + '<button class="btn-cancel" id="btn-cancel-add">'+t("btnCancel")+'</button>'
+        + '</div></div>';
+    }
+  }
+
+  function flashRow(position){
+    var tbody = document.getElementById("tbody");
+    var row = tbody && (position==="first" ? tbody.querySelector("tr:first-child") : tbody.querySelector("tr:last-child"));
+    if (!row) return;
+    row.classList.add("row-flash");
+    setTimeout(function(){ row.classList.remove("row-flash"); }, 1600);
+  }
+
+  function submitAddPanel(){
+    var titleEl = document.getElementById("new-title");
+    var title = titleEl ? titleEl.value.trim() : "";
+    if (!title){ toast("Please fill in a title first."); return; }
+
+    var timeEl = document.getElementById("new-time");
+    var time = timeEl ? timeEl.value : "";
+
+    var flashPos = "last";
+    if (state.section==="announcements"){
+      var body = (document.getElementById("new-body").value || "").trim() || "No details provided.";
+      announcements.unshift({ id:nextId(announcements), title:title, body:body, postedOn:TODAY, time:time || nowHHMM() });
+      toast("Announcement posted");
+      flashPos = "first";
+    } else if (state.section==="agenda"){
+      var date = (document.getElementById("new-date").value || "").trim() || "TBD";
+      var location = (document.getElementById("new-location").value || "").trim() || "TBD";
+      var note = (document.getElementById("new-note").value || "").trim();
+      agenda.push({ id:nextId(agenda), title:title, date:date, time:time, location:location, note:note });
+      toast("Agenda item added");
+    } else if (state.section==="touring"){
+      var scheduledFor = (document.getElementById("new-date").value || "").trim() || "TBD";
+      var waypoints = (document.getElementById("new-note").value || "").trim() || "Not specified yet";
+      touringRoutes.push({ id:nextId(touringRoutes), name:title, waypoints:waypoints, scheduledFor:scheduledFor, time:time, status:"inactive", riders:0, participants:[] });
+      state.touringTab = "upcoming";
+      toast("Route added");
+    } else if (state.section==="merchandise"){
+      var digits = function(id){ return parseInt((document.getElementById(id).value || "").replace(/\D/g, ""), 10) || 0; };
+      merchandise.push({
+        id:nextId(merchandise), name:title,
+        category:(document.getElementById("new-category").value || "").trim() || "Apparel",
+        price:digits("new-price"), stock:digits("new-stock"), sold:0, status:"active", icon:"default",
+        desc:(document.getElementById("new-note").value || "").trim() || "No details provided."
+      });
+      state.merchTab = "products";
+      toast("“" + title + "” added — now live in the app");
+    }
+
+    state.addPanelOpen = false;
+    renderAll();
+    flashRow(flashPos);
+  }
+
+  // ---------- EVENTS ----------
+  function attachEvents(){
+    window.addEventListener("resize", updateNavThumb);
+    window.addEventListener("resize", updateTabThumb);
+    var fitTimer = null;
+    window.addEventListener("resize", function(){
+      clearTimeout(fitTimer);
+      fitTimer = setTimeout(function(){ hideVizTooltip(); fitCharts(false); }, 120);
+    });
+
+    document.getElementById("search").addEventListener("input", function(e){
+      state.query = e.target.value;
+      if (state.section==="members") renderMemberBody();
+      else if (state.section==="merchandise") renderMerchTable();
+      else if (state.section==="touring") renderTouringTable();
+      else if (state.section==="qris") renderQrisBody();
+      else if (state.section==="directory") renderDirectoryTable();
+      else if (state.section==="lora") renderLoraTable();
+      else if (state.section==="auditlog") renderAuditLogTable();
+
+      var searchBox = document.querySelector(".search");
+      var noResults = document.querySelector("#tbody .empty-state");
+      if (searchBox && noResults && state.query){
+        searchBox.classList.remove("shake");
+        void searchBox.offsetWidth;
+        searchBox.classList.add("shake");
+      }
+    });
+
+    document.querySelector(".sidebar").addEventListener("click", function(e){
+      var btn = e.target.closest ? e.target.closest(".nav-item[data-section]") : null;
+      if (!btn || btn.disabled) return;
+      var section = btn.getAttribute("data-section");
+      closeSidebar();
+      hideVizTooltip();
+      if (section === state.section) return;
+      state.section = section;
+      state.query = "";
+      state.openDetail = null;
+      state.openReject = null;
+      state.addPanelOpen = false;
+      var search = document.getElementById("search");
+      if (search) search.value = "";
+      renderAll();
+      document.querySelector(".content").scrollTop = 0;
+    });
+
+    document.getElementById("dashboard-view").addEventListener("click", function(e){
+      var rangeBtn = e.target.closest ? e.target.closest("[data-range]") : null;
+      if (rangeBtn){
+        state.dashRange = parseInt(rangeBtn.getAttribute("data-range"), 10);
+        renderDashboard();
+        return;
+      }
+      var toggleBtn = e.target.closest ? e.target.closest("[data-toggle-chart]") : null;
+      if (toggleBtn){
+        var chartId = toggleBtn.getAttribute("data-toggle-chart");
+        state.dashChartView[chartId] = !state.dashChartView[chartId];
+        renderDashboard();
+        return;
+      }
+      var gotoBtn = e.target.closest ? e.target.closest("[data-goto]") : null;
+      if (!gotoBtn) return;
+      var navBtn = document.querySelector('.nav-item[data-section="'+gotoBtn.getAttribute("data-goto")+'"]');
+      if (navBtn) navBtn.click();
+    });
+
+    document.getElementById("dashboard-view").addEventListener("mouseover", function(e){
+      var overlay = e.target.closest ? e.target.closest("[data-area-points]") : null;
+      if (overlay){ handleAreaOverlayHover(overlay, e); return; }
+      var el = e.target.closest ? e.target.closest("[data-tt]") : null;
+      if (!el) return;
+      showVizTooltip(el.getAttribute("data-tt"), e.clientX, e.clientY);
+    });
+    document.getElementById("dashboard-view").addEventListener("mousemove", function(e){
+      var overlay = e.target.closest ? e.target.closest("[data-area-points]") : null;
+      if (overlay){ handleAreaOverlayHover(overlay, e); return; }
+      if (!vizTooltipEl || vizTooltipEl.hidden) return;
+      var el = e.target.closest ? e.target.closest("[data-tt]") : null;
+      if (!el){ hideVizTooltip(); return; }
+      positionVizTooltip(e.clientX, e.clientY);
+    });
+    document.getElementById("dashboard-view").addEventListener("mouseout", function(e){
+      var from = e.target.closest ? e.target.closest("[data-tt],[data-area-points]") : null;
+      if (!from) return;
+      var to = e.relatedTarget && e.relatedTarget.closest ? e.relatedTarget.closest("[data-tt],[data-area-points]") : null;
+      if (from !== to) hideVizTooltip();
+    });
+    document.getElementById("dashboard-view").addEventListener("mouseleave", hideVizTooltip);
+
+    document.getElementById("btn-menu").addEventListener("click", function(){
+      var sidebar = document.querySelector(".sidebar");
+      if (sidebar.classList.contains("open")) closeSidebar(); else openSidebar();
+    });
+
+    document.getElementById("sidebar-overlay").addEventListener("click", closeSidebar);
+
+    document.getElementById("btn-account").addEventListener("click", function(e){
+      e.stopPropagation();
+      var menu = document.getElementById("account-menu");
+      if (menu.hidden) openAccountMenu(); else closeAccountMenu();
+    });
+
+    document.addEventListener("click", function(e){
+      var menu = document.getElementById("account-menu");
+      if (menu.hidden) return;
+      if (e.target.closest && e.target.closest(".account")) return;
+      closeAccountMenu();
+    });
+
+    document.getElementById("lang-switch").addEventListener("click", function(e){
+      var btn = e.target.closest ? e.target.closest(".lang-btn") : null;
+      if (!btn) return;
+      setLanguage(btn.getAttribute("data-lang"));
+    });
+
+    document.getElementById("theme-switch").addEventListener("click", function(e){
+      var btn = e.target.closest ? e.target.closest(".theme-btn") : null;
+      if (!btn) return;
+      setTheme(btn.getAttribute("data-theme-value"));
+    });
+
+    document.getElementById("content-header").addEventListener("click", function(e){
+      if (e.target && e.target.id === "btn-add"){
+        state.addPanelOpen = !state.addPanelOpen;
+        renderAddPanel();
+      }
+    });
+
+    document.getElementById("add-panel").addEventListener("click", function(e){
+      if (e.target && e.target.id === "btn-save") submitAddPanel();
+      if (e.target && e.target.id === "btn-cancel-add"){ state.addPanelOpen = false; renderAddPanel(); }
+    });
+
+    document.addEventListener("click", function(e){
+      if (e.target.closest && (e.target.closest("#role-menu-portal") || e.target.closest("[data-role-toggle]"))) return;
+      closeAllRoleMenus();
+    });
+
+    document.getElementById("role-menu-portal").addEventListener("click", function(e){
+      var roleOptionBtn = e.target.closest ? e.target.closest("[data-role-option]") : null;
+      if (!roleOptionBtn) return;
+      e.stopPropagation();
+      var roleMemberId = roleOptionBtn.getAttribute("data-role-option");
+      var newRole = roleOptionBtn.getAttribute("data-role-value");
+      var roleMember = members.find(function(x){ return x.id==roleMemberId; });
+      roleMember.role = newRole;
+      toast(roleMember.name + "’s role updated to " + newRole);
+      closeAllRoleMenus();
+      renderDirectoryTable();
+    });
+
+    document.addEventListener("click", function(e){
+      if (e.target.closest && (e.target.closest("#match-menu-portal") || e.target.closest("[data-match-toggle]"))) return;
+      closeAllMatchMenus();
+    });
+
+    document.getElementById("match-menu-portal").addEventListener("click", function(e){
+      var matchOptionBtn = e.target.closest ? e.target.closest("[data-match-option]") : null;
+      if (!matchOptionBtn) return;
+      e.stopPropagation();
+      var matchTxId = matchOptionBtn.getAttribute("data-match-option");
+      var matchMemberId = matchOptionBtn.getAttribute("data-match-value");
+      var txToMatch = qrisTransactions.find(function(x){ return x.id==matchTxId; });
+      var pickedMember = members.find(function(m){ return m.id==matchMemberId; });
+      pickedMember.payment = "Paid";
+      txToMatch.status = "matched";
+      txToMatch.matchedTo = pickedMember.name;
+      justMatchedIds.push(txToMatch.id);
+      toast("Matched to " + pickedMember.name);
+      closeAllMatchMenus();
+      renderQrisTabs();
+      renderQrisHead();
+      renderQrisBody();
+    });
+
+    document.getElementById("tbody").addEventListener("click", function(e){
+      var approveId = e.target.getAttribute && e.target.getAttribute("data-approve");
+      var rejectId = e.target.getAttribute && e.target.getAttribute("data-reject");
+      var confirmRejectId = e.target.getAttribute && e.target.getAttribute("data-confirm-reject");
+      var cancelRejectId = e.target.getAttribute && e.target.getAttribute("data-cancel-reject");
+      var deleteAnnouncementId = e.target.getAttribute && e.target.getAttribute("data-delete-announcement");
+      var deleteAgendaId = e.target.getAttribute && e.target.getAttribute("data-delete-agenda");
+      var deleteRouteId = e.target.getAttribute && e.target.getAttribute("data-delete-route");
+      var activateId = e.target.getAttribute && e.target.getAttribute("data-activate");
+      var deactivateId = e.target.getAttribute && e.target.getAttribute("data-deactivate");
+      var unpairId = e.target.getAttribute && e.target.getAttribute("data-unpair");
+      var merchHideId = e.target.getAttribute && e.target.getAttribute("data-merch-hide");
+      var merchShowId = e.target.getAttribute && e.target.getAttribute("data-merch-show");
+      var merchRemoveId = e.target.getAttribute && e.target.getAttribute("data-merch-remove");
+      var orderAdvanceId = e.target.getAttribute && e.target.getAttribute("data-order-advance");
+      var roleToggleBtn = e.target.closest ? e.target.closest("[data-role-toggle]") : null;
+      var matchToggleBtn = e.target.closest ? e.target.closest("[data-match-toggle]") : null;
+      var row = e.target.closest ? e.target.closest("tr.data-row") : null;
+
+      var list = members;
+
+      if (roleToggleBtn){
+        e.stopPropagation();
+        openRoleMenu(roleToggleBtn);
+        return;
+      }
+
+      if (matchToggleBtn){
+        e.stopPropagation();
+        openMatchMenu(matchToggleBtn);
+        return;
+      }
+
+      if (approveId){
+        e.stopPropagation();
+        var m = list.find(function(x){ return x.id==approveId; });
+        playButtonReaction(e.target, "up", function(){
+          m.status = "approved";
+          m.decidedOn = TODAY;
+          m.code = genCode();
+          m.role = m.role || "Anggota";
+          toast("Approved " + m.name + " — Kode Komunitas " + m.code + " emailed");
+          state.openDetail = null;
+          render();
+        });
+        return;
+      }
+      if (rejectId){
+        e.stopPropagation();
+        state.openReject = Number(rejectId);
+        state.openDetail = null;
+        renderTableOnly();
+        return;
+      }
+      if (confirmRejectId){
+        e.stopPropagation();
+        var ta = document.getElementById("reject-reason");
+        var reason = (ta && ta.value.trim()) || "No reason provided.";
+        var mr = list.find(function(x){ return x.id==confirmRejectId; });
+        playButtonReaction(e.target, "down", function(){
+          mr.status = "rejected";
+          mr.reason = reason;
+          mr.decidedOn = TODAY;
+          state.openReject = null;
+          toast("Rejected " + mr.name + " — email sent with reason");
+          render();
+        });
+        return;
+      }
+      if (cancelRejectId){
+        e.stopPropagation();
+        state.openReject = null;
+        renderTableOnly();
+        return;
+      }
+      if (deleteAnnouncementId){
+        e.stopPropagation();
+        playButtonReaction(e.target, "trash", function(){
+          announcements = announcements.filter(function(a){ return a.id != deleteAnnouncementId; });
+          toast("Announcement removed");
+          renderAnnouncementsTable();
+        });
+        return;
+      }
+      if (deleteAgendaId){
+        e.stopPropagation();
+        playButtonReaction(e.target, "trash", function(){
+          agenda = agenda.filter(function(a){ return a.id != deleteAgendaId; });
+          toast("Agenda item removed");
+          renderAgendaTable();
+        });
+        return;
+      }
+      if (activateId){
+        e.stopPropagation();
+        var route = touringRoutes.find(function(r){ return r.id==activateId; });
+        playButtonReaction(e.target, "check", function(){
+          route.status = "active";
+          toast('"' + route.name + '" is now active — members can see navigation and trip info');
+          renderTouringAll();
+        });
+        return;
+      }
+      if (deactivateId){
+        e.stopPropagation();
+        var route2 = touringRoutes.find(function(r){ return r.id==deactivateId; });
+        playButtonReaction(e.target, "x", function(){
+          route2.status = "inactive";
+          toast('"' + route2.name + '" deactivated');
+          renderTouringAll();
+        });
+        return;
+      }
+      if (deleteRouteId){
+        e.stopPropagation();
+        playButtonReaction(e.target, "trash", function(){
+          var removed = touringRoutes.find(function(r){ return r.id==deleteRouteId; });
+          touringRoutes = touringRoutes.filter(function(r){ return r.id != deleteRouteId; });
+          toast('"' + (removed ? removed.name : "Route") + '" removed');
+          state.openDetail = null;
+          renderTouringAll();
+        });
+        return;
+      }
+      if (merchHideId || merchShowId){
+        e.stopPropagation();
+        var product = merchandise.find(function(p){ return p.id==(merchHideId || merchShowId); });
+        playButtonReaction(e.target, merchHideId ? "eyeoff" : "eyeon", function(){
+          product.status = merchHideId ? "hidden" : "active";
+          toast(merchHideId ? "“" + product.name + "” hidden from the app" : "“" + product.name + "” is now live in the app");
+          renderMerchTable();
+        });
+        return;
+      }
+      if (merchRemoveId){
+        e.stopPropagation();
+        playButtonReaction(e.target, "trash", function(){
+          var removedProduct = merchandise.find(function(p){ return p.id==merchRemoveId; });
+          merchandise = merchandise.filter(function(p){ return p.id != merchRemoveId; });
+          state.openDetail = null;
+          toast("“" + (removedProduct ? removedProduct.name : "Product") + "” removed");
+          renderMerchTabs();
+          renderMerchTable();
+        });
+        return;
+      }
+      if (orderAdvanceId){
+        e.stopPropagation();
+        var order = merchOrders.find(function(o){ return o.id==orderAdvanceId; });
+        playButtonReaction(e.target, "check", function(){
+          order.status = ORDER_FLOW[order.status].next;
+          toast(order.orderNo + " — " + t(ORDER_FLOW[order.status].labelKey));
+          renderNav();
+          renderMerchTable();
+        });
+        return;
+      }
+      if (unpairId){
+        e.stopPropagation();
+        playButtonReaction(e.target, "trash", function(){
+          var removedDevice = loraDevices.find(function(d){ return d.id==unpairId; });
+          loraDevices = loraDevices.filter(function(d){ return d.id != unpairId; });
+          state.openDetail = null;
+          toast((removedDevice ? removedDevice.model : "Device") + " unpaired");
+          renderNav();
+          renderLoraTable();
+        });
+        return;
+      }
+      if (row && (state.section==="members" || state.section==="merchandise" || state.section==="lora" || state.section==="directory" || state.section==="touring")){
+        var id = Number(row.getAttribute("data-id"));
+        state.openDetail = (state.openDetail===id) ? null : id;
+        state.openReject = null;
+        renderTableOnly();
+      }
+    });
+
+    document.getElementById("btn-signin").addEventListener("click", function(){
+      var label = document.getElementById("signin-label");
+      var btn = document.getElementById("btn-signin");
+      btn.disabled = true;
+      label.textContent = t("signingIn");
+      setTimeout(function(){
+        document.getElementById("view-login").hidden = true;
+        document.getElementById("view-app").hidden = false;
+        state.dashboardIntroPending = true;
+        renderAll();
+      }, 550);
+    });
+
+    document.getElementById("btn-logout").addEventListener("click", function(){
+      closeAccountMenu();
+      document.getElementById("logout-overlay").hidden = false;
+    });
+
+    document.getElementById("logout-overlay").addEventListener("click", function(e){
+      var isCancel = e.target.id === "logout-overlay" || (e.target.closest && e.target.closest("#btn-logout-cancel"));
+      var isConfirm = e.target.closest && e.target.closest("#btn-logout-confirm");
+      if (isCancel){
+        document.getElementById("logout-overlay").hidden = true;
+      }
+      if (isConfirm){
+        var confirmBtn = document.getElementById("btn-logout-confirm");
+        var cancelBtn = document.getElementById("btn-logout-cancel");
+        var originalHtml = confirmBtn.innerHTML;
+        confirmBtn.disabled = true;
+        cancelBtn.disabled = true;
+        confirmBtn.classList.add("btn-reacting");
+        confirmBtn.innerHTML = '<span class="btn-reaction-icon icon-wave">'+REACTION_ICONS.wave+'</span>';
+        setTimeout(function(){
+          document.getElementById("logout-overlay").hidden = true;
+          document.getElementById("view-app").hidden = true;
+          document.getElementById("view-login").hidden = false;
+          var btn = document.getElementById("btn-signin");
+          btn.disabled = false;
+          document.getElementById("signin-label").textContent = t("signIn");
+          confirmBtn.classList.remove("btn-reacting");
+          confirmBtn.innerHTML = originalHtml;
+          confirmBtn.disabled = false;
+          cancelBtn.disabled = false;
+        }, 650);
+      }
+    });
+  }
+
+  function renderTableOnly(){
+    if (state.section==="members") renderMemberBody();
+    else if (state.section==="merchandise") renderMerchTable();
+    else if (state.section==="lora") renderLoraTable();
+    else if (state.section==="directory") renderDirectoryTable();
+    else if (state.section==="touring") renderTouringTable();
+  }
+
+  function render(){
+    renderNav();
+    if (state.section==="members"){
+      renderMemberTabs();
+      renderMemberHead();
+      renderMemberBody();
+    } else if (state.section==="merchandise"){
+      renderMerchTabs();
+      renderMerchTable();
+    } else if (state.section==="touring"){
+      renderTouringAll();
+    } else if (state.section==="qris"){
+      renderQrisTabs();
+      renderQrisHead();
+      renderQrisBody();
+    }
+  }
+
+  function renderAll(){
+    renderNav();
+    renderHeader();
+
+    var isDashboard = state.section==="dashboard";
+    var isTabbed = state.section==="members" || state.section==="merchandise" || state.section==="touring" || state.section==="qris";
+    var showToolbar = isTabbed || state.section==="directory" || state.section==="lora" || state.section==="auditlog";
+    document.getElementById("tabs").hidden = !isTabbed;
+    document.getElementById("toolbar").hidden = !showToolbar;
+    document.getElementById("dashboard-view").hidden = !isDashboard;
+    document.getElementById("table-wrap").hidden = isDashboard;
+
+    renderAddPanel();
+
+    if (state.section==="dashboard"){
+      renderDashboard();
+    } else if (state.section==="members"){
+      renderMemberTabs();
+      renderMemberHead();
+      renderMemberBody();
+    } else if (state.section==="merchandise"){
+      renderMerchTabs();
+      renderMerchTable();
+    } else if (state.section==="qris"){
+      renderQrisTabs();
+      renderQrisHead();
+      renderQrisBody();
+    } else if (state.section==="directory"){
+      renderDirectoryTable();
+    } else if (state.section==="announcements"){
+      renderAnnouncementsTable();
+    } else if (state.section==="agenda"){
+      renderAgendaTable();
+    } else if (state.section==="touring"){
+      renderTouringAll();
+    } else if (state.section==="lora"){
+      renderLoraTable();
+    } else if (state.section==="auditlog"){
+      renderAuditLogTable();
+    }
+  }
+
+  function pad2(n){ return n < 10 ? "0"+n : ""+n; }
+
+  var DAY_NAMES = {
+    en: ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],
+    id: ["Min","Sen","Sel","Rab","Kam","Jum","Sab"]
+  };
+  var MONTH_NAMES = {
+    en: ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+    id: ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"]
+  };
+
+  function tickClock(){
+    var now = new Date();
+    var h = now.getHours() % 12;
+    var m = now.getMinutes();
+    var s = now.getSeconds();
+
+    var days = DAY_NAMES[state.lang] || DAY_NAMES.en;
+    var months = MONTH_NAMES[state.lang] || MONTH_NAMES.en;
+    document.getElementById("clock-date").textContent = days[now.getDay()] + ", " + now.getDate() + " " + months[now.getMonth()];
+    document.getElementById("clock-time").textContent = pad2(now.getHours()) + ":" + pad2(m);
+    document.getElementById("clock-seconds").textContent = ":" + pad2(s);
+    document.getElementById("clock-hour").setAttribute("transform", "rotate(" + (h * 30 + m * 0.5) + " 12 12)");
+    document.getElementById("clock-minute").setAttribute("transform", "rotate(" + (m * 6 + s * 0.1) + " 12 12)");
+    document.getElementById("clock-second").setAttribute("transform", "rotate(" + (s * 6) + " 12 12)");
+  }
+
+  function startLoginSlideshow(){
+    var slides = document.querySelectorAll("#login-slideshow .login-slide");
+    if (slides.length < 2) return;
+    var idx = 0;
+    setInterval(function(){
+      slides[idx].classList.remove("active");
+      idx = (idx + 1) % slides.length;
+      slides[idx].classList.add("active");
+    }, 4500);
+  }
+
+  attachEvents();
+  applyStaticI18n();
+  renderAll();
+  tickClock();
+  setInterval(tickClock, 1000);
+  startLoginSlideshow();
+})();
+</script>
+</body>
+</html>
