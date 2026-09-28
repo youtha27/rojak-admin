@@ -267,7 +267,8 @@
   .search.shake{animation:search-shake .4s ease;}
 
   /* ---------- APP SHELL ---------- */
-  #view-app{display:flex; flex-direction:column; min-height:100%;}
+  /* Shell is pinned to the viewport; sidebar and .content scroll independently */
+  #view-app{display:flex; flex-direction:column; height:100vh; height:100dvh; overflow:hidden;}
 
   .topbar{
     position:sticky; top:0; z-index:20;
@@ -381,6 +382,7 @@
     display:flex; flex-direction:column; gap:2px;
     border-right:1px solid var(--chrome-line);
     padding-bottom:calc(18px + env(safe-area-inset-bottom,0px));
+    overflow-y:auto; overscroll-behavior:contain;
   }
   .nav-thumb{
     position:absolute; left:12px; right:12px; top:0; height:0; opacity:0;
@@ -416,7 +418,7 @@
   .nav-sep{height:1px; background:var(--chrome-line); margin:12px 10px;}
 
   .content{
-    flex:1; min-width:0; overflow-y:auto;
+    flex:1; min-width:0; overflow-y:auto; overscroll-behavior:contain;
     background:var(--paper);
     padding:26px max(28px,16px) 40px;
   }
@@ -1743,7 +1745,7 @@
       chipPaid: "Paid", chipUnpaid: "Unpaid", chipActive: "Active", chipInactive: "Inactive",
       chipLiveInApp: "Live in app", chipRejected: "Rejected", chipNoNameMatch: "No name match",
       chipMatchedPrefix: "Matched — ", chipOnline: "Online", chipOffline: "Offline",
-      chipAuditApprove: "Approved", chipAuditReject: "Rejected", chipAuditEdit: "Updated", chipAuditCreate: "Created",
+      chipAuditApprove: "Approved", chipAuditReject: "Rejected", chipAuditEdit: "Updated", chipAuditCreate: "Created", chipAuditRemove: "Removed",
 
       emptyMembers: "No {0} members{1}.",
       emptyTransactions: "No {0} transactions{1}.",
@@ -1899,7 +1901,7 @@
       chipPaid: "Lunas", chipUnpaid: "Belum Lunas", chipActive: "Aktif", chipInactive: "Nonaktif",
       chipLiveInApp: "Tayang di aplikasi", chipRejected: "Ditolak", chipNoNameMatch: "Nama tidak cocok",
       chipMatchedPrefix: "Cocok — ", chipOnline: "Online", chipOffline: "Offline",
-      chipAuditApprove: "Disetujui", chipAuditReject: "Ditolak", chipAuditEdit: "Diperbarui", chipAuditCreate: "Dibuat",
+      chipAuditApprove: "Disetujui", chipAuditReject: "Ditolak", chipAuditEdit: "Diperbarui", chipAuditCreate: "Dibuat", chipAuditRemove: "Dihapus",
 
       emptyMembers: "Belum ada anggota {0}{1}.",
       emptyTransactions: "Belum ada transaksi {0}{1}.",
@@ -2078,6 +2080,17 @@
     return '<div><div>'+esc(date)+'</div>' + (time ? '<div class="cell-sub">'+esc(time)+' WIB</div>' : '') + '</div>';
   }
   function nowHHMM(){ var d = new Date(); return pad2(d.getHours()) + ":" + pad2(d.getMinutes()); }
+
+  // Records an admin action; newest first so the dashboard's "recent activity" picks it up too
+  var AUDIT_MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  function logAudit(type, desc){
+    var d = new Date();
+    auditLog.unshift({
+      id:nextId(auditLog),
+      at:d.getDate() + " " + AUDIT_MONTHS[d.getMonth()] + " " + d.getFullYear() + ", " + nowHHMM(),
+      admin:"Marshall Adiwijaya", type:type, desc:desc
+    });
+  }
 
   function fmtNum(n){ return Math.round(n).toLocaleString(state.lang==="id" ? "id-ID" : "en-GB"); }
   function fmtDuration(min){ return t("durHM", Math.floor(min/60), min%60); }
@@ -3026,8 +3039,8 @@
   }
 
   // ---------- AUDIT LOG ----------
-  var AUDIT_CHIP_CLASS = { approve:"good", reject:"bad", edit:"neutral", create:"neutral" };
-  var AUDIT_CHIP_LABEL = { approve:"chipAuditApprove", reject:"chipAuditReject", edit:"chipAuditEdit", create:"chipAuditCreate" };
+  var AUDIT_CHIP_CLASS = { approve:"good", reject:"bad", edit:"neutral", create:"neutral", remove:"bad" };
+  var AUDIT_CHIP_LABEL = { approve:"chipAuditApprove", reject:"chipAuditReject", edit:"chipAuditEdit", create:"chipAuditCreate", remove:"chipAuditRemove" };
 
   function matchesAuditLog(a){
     if (!state.query) return true;
@@ -3139,6 +3152,7 @@
     if (state.section==="announcements"){
       var body = (document.getElementById("new-body").value || "").trim() || "No details provided.";
       announcements.unshift({ id:nextId(announcements), title:title, body:body, postedOn:TODAY, time:time || nowHHMM() });
+      logAudit("create", "Published announcement — " + title);
       toast("Announcement posted");
       flashPos = "first";
     } else if (state.section==="agenda"){
@@ -3146,12 +3160,14 @@
       var location = (document.getElementById("new-location").value || "").trim() || "TBD";
       var note = (document.getElementById("new-note").value || "").trim();
       agenda.push({ id:nextId(agenda), title:title, date:date, time:time, location:location, note:note });
+      logAudit("create", "Added agenda item — " + title);
       toast("Agenda item added");
     } else if (state.section==="touring"){
       var scheduledFor = (document.getElementById("new-date").value || "").trim() || "TBD";
       var waypoints = (document.getElementById("new-note").value || "").trim() || "Not specified yet";
       touringRoutes.push({ id:nextId(touringRoutes), name:title, waypoints:waypoints, scheduledFor:scheduledFor, time:time, status:"inactive", riders:0, participants:[] });
       state.touringTab = "upcoming";
+      logAudit("create", "Added touring route — " + title);
       toast("Route added");
     } else if (state.section==="merchandise"){
       var digits = function(id){ return parseInt((document.getElementById(id).value || "").replace(/\D/g, ""), 10) || 0; };
@@ -3162,6 +3178,7 @@
         desc:(document.getElementById("new-note").value || "").trim() || "No details provided."
       });
       state.merchTab = "products";
+      logAudit("create", "Added merchandise product — " + title);
       toast("“" + title + "” added — now live in the app");
     }
 
@@ -3317,6 +3334,7 @@
       var newRole = roleOptionBtn.getAttribute("data-role-value");
       var roleMember = members.find(function(x){ return x.id==roleMemberId; });
       roleMember.role = newRole;
+      logAudit("edit", "Updated role to " + newRole + " — " + roleMember.name);
       toast(roleMember.name + "’s role updated to " + newRole);
       closeAllRoleMenus();
       renderDirectoryTable();
@@ -3339,6 +3357,7 @@
       txToMatch.status = "matched";
       txToMatch.matchedTo = pickedMember.name;
       justMatchedIds.push(txToMatch.id);
+      logAudit("edit", "Manually matched QRIS payment " + txToMatch.reference + " — " + pickedMember.name);
       toast("Matched to " + pickedMember.name);
       closeAllMatchMenus();
       renderQrisTabs();
@@ -3387,6 +3406,7 @@
           m.decidedOn = TODAY;
           m.code = genCode();
           m.role = m.role || "Anggota";
+          logAudit("approve", "Approved member application — " + m.name + " (" + m.code + ")");
           toast("Approved " + m.name + " — Kode Komunitas " + m.code + " emailed");
           state.openDetail = null;
           render();
@@ -3410,6 +3430,7 @@
           mr.reason = reason;
           mr.decidedOn = TODAY;
           state.openReject = null;
+          logAudit("reject", "Rejected member application — " + mr.name + ": " + reason);
           toast("Rejected " + mr.name + " — email sent with reason");
           render();
         });
@@ -3424,7 +3445,9 @@
       if (deleteAnnouncementId){
         e.stopPropagation();
         playButtonReaction(e.target, "trash", function(){
+          var removedAnn = announcements.find(function(a){ return a.id == deleteAnnouncementId; });
           announcements = announcements.filter(function(a){ return a.id != deleteAnnouncementId; });
+          logAudit("remove", "Removed announcement — " + (removedAnn ? removedAnn.title : "Announcement"));
           toast("Announcement removed");
           renderAnnouncementsTable();
         });
@@ -3433,7 +3456,9 @@
       if (deleteAgendaId){
         e.stopPropagation();
         playButtonReaction(e.target, "trash", function(){
+          var removedAgenda = agenda.find(function(a){ return a.id == deleteAgendaId; });
           agenda = agenda.filter(function(a){ return a.id != deleteAgendaId; });
+          logAudit("remove", "Removed agenda item — " + (removedAgenda ? removedAgenda.title : "Agenda item"));
           toast("Agenda item removed");
           renderAgendaTable();
         });
@@ -3444,6 +3469,7 @@
         var route = touringRoutes.find(function(r){ return r.id==activateId; });
         playButtonReaction(e.target, "check", function(){
           route.status = "active";
+          logAudit("edit", "Activated touring route — " + route.name);
           toast('"' + route.name + '" is now active — members can see navigation and trip info');
           renderTouringAll();
         });
@@ -3454,6 +3480,7 @@
         var route2 = touringRoutes.find(function(r){ return r.id==deactivateId; });
         playButtonReaction(e.target, "x", function(){
           route2.status = "inactive";
+          logAudit("edit", "Deactivated touring route — " + route2.name);
           toast('"' + route2.name + '" deactivated');
           renderTouringAll();
         });
@@ -3464,6 +3491,7 @@
         playButtonReaction(e.target, "trash", function(){
           var removed = touringRoutes.find(function(r){ return r.id==deleteRouteId; });
           touringRoutes = touringRoutes.filter(function(r){ return r.id != deleteRouteId; });
+          logAudit("remove", "Removed touring route — " + (removed ? removed.name : "Route"));
           toast('"' + (removed ? removed.name : "Route") + '" removed');
           state.openDetail = null;
           renderTouringAll();
@@ -3475,6 +3503,7 @@
         var product = merchandise.find(function(p){ return p.id==(merchHideId || merchShowId); });
         playButtonReaction(e.target, merchHideId ? "eyeoff" : "eyeon", function(){
           product.status = merchHideId ? "hidden" : "active";
+          logAudit("edit", (merchHideId ? "Hid merchandise product — " : "Published merchandise product — ") + product.name);
           toast(merchHideId ? "“" + product.name + "” hidden from the app" : "“" + product.name + "” is now live in the app");
           renderMerchTable();
         });
@@ -3486,6 +3515,7 @@
           var removedProduct = merchandise.find(function(p){ return p.id==merchRemoveId; });
           merchandise = merchandise.filter(function(p){ return p.id != merchRemoveId; });
           state.openDetail = null;
+          logAudit("remove", "Removed merchandise product — " + (removedProduct ? removedProduct.name : "Product"));
           toast("“" + (removedProduct ? removedProduct.name : "Product") + "” removed");
           renderMerchTabs();
           renderMerchTable();
@@ -3497,6 +3527,7 @@
         var order = merchOrders.find(function(o){ return o.id==orderAdvanceId; });
         playButtonReaction(e.target, "check", function(){
           order.status = ORDER_FLOW[order.status].next;
+          logAudit("edit", "Updated order status to " + t(ORDER_FLOW[order.status].labelKey) + " — " + order.orderNo);
           toast(order.orderNo + " — " + t(ORDER_FLOW[order.status].labelKey));
           renderNav();
           renderMerchTable();
@@ -3509,6 +3540,7 @@
           var removedDevice = loraDevices.find(function(d){ return d.id==unpairId; });
           loraDevices = loraDevices.filter(function(d){ return d.id != unpairId; });
           state.openDetail = null;
+          logAudit("remove", "Unpaired LoRa device — " + (removedDevice ? removedDevice.deviceId + " (" + removedDevice.owner + ")" : "Device"));
           toast((removedDevice ? removedDevice.model : "Device") + " unpaired");
           renderNav();
           renderLoraTable();
