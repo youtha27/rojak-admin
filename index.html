@@ -415,8 +415,11 @@
     background:var(--chrome-overlay); color:var(--chrome-text-soft);
   }
   .nav-item.active .tag{background:var(--accent); color:var(--accent-ink);}
-  .nav-sep{height:1px; background:var(--chrome-line); margin:12px 10px;}
-
+  /* flex:none — in a short, scrolling sidebar these empty 1px lines would otherwise shrink to nothing */
+  .nav-sep{height:1px; flex:none; background:var(--chrome-line); margin:12px 10px;}
+  /* Second log-out option, pushed to the bottom of the sidebar (after the nav when the sidebar is short) */
+  .sidebar-foot{margin-top:auto; flex:none; position:relative; z-index:1;}
+  .nav-logout:hover{color:var(--bad-text);}
   .content{
     flex:1; min-width:0; overflow-y:auto; overscroll-behavior:contain;
     background:var(--paper);
@@ -788,7 +791,8 @@
     .ride-stats{grid-template-columns:1fr;}
   }
 
-  @media (max-width:760px){
+  /* Phones and folded foldables: sidebar is a slide-out drawer */
+  @media (max-width:599px){
     .menu-toggle{display:inline-flex;}
 
     .sidebar{
@@ -808,8 +812,49 @@
     .sidebar-overlay{display:block;}
 
     .shell-body{flex-direction:column;}
+  }
+
+  /* Tablets and unfolded foldables: an always-visible icon rail that scrolls on its own
+     next to the content; the menu button expands it over the content to show labels */
+  @media (min-width:600px) and (max-width:1024px){
+    .menu-toggle{display:inline-flex;}
+
+    .shell-body{position:relative; padding-left:68px;}
+    .sidebar{
+      position:absolute; top:0; bottom:0; left:0; z-index:40;
+      width:68px; padding:12px 8px calc(12px + env(safe-area-inset-bottom,0px));
+      overflow-x:hidden; overflow-y:auto; -webkit-overflow-scrolling:touch;
+      transition:width .22s ease, box-shadow .22s ease;
+    }
+    .sidebar.open{width:236px; padding-left:12px; padding-right:12px; box-shadow:24px 0 48px -24px rgba(0,0,0,0.6);}
+    .nav-thumb{left:8px; right:8px;}
+    .sidebar.open .nav-thumb{left:12px; right:12px;}
+
+    .sidebar:not(.open) .nav-label{display:none;}
+    .sidebar:not(.open) .nav-sep{margin:10px 6px;}
+    .sidebar:not(.open) .nav-item{justify-content:center; padding:12px 0;}
+    .sidebar:not(.open) .nav-item-main{flex:none;}
+    .sidebar:not(.open) .nav-item-main span{display:none;}
+    .sidebar:not(.open) .nav-icon{width:18px; height:18px;}
+    .sidebar:not(.open) .nav-item .tag{
+      position:absolute; top:3px; right:4px;
+      font-size:9px; padding:1px 5px; background:var(--accent); color:var(--accent-ink);
+    }
+    .sidebar:not(.open) .nav-item .tag.is-zero{display:none;}
+
+    .sidebar-overlay{display:block;}
+  }
+
+  /* Sidebar and content are side by side: each finger scrolls its own pane (see initPaneTouchScroll) */
+  @media (min-width:600px){
+    .sidebar, .content{touch-action:none;}
+  }
+
+  @media (max-width:760px){
     .account-email{display:none;}
-    .app-clock{padding:6px 9px;}
+    /* Right group fills the free space so the clock can sit centred between brand and account */
+    .topbar-right{flex:1; min-width:0;}
+    .app-clock{padding:6px 9px; margin-inline:auto;}
     .app-clock #clock-date, .app-clock .clock-sep, .app-clock #clock-seconds{display:none;}
     .content{padding:18px 14px 32px;}
 
@@ -1011,6 +1056,15 @@
           <span data-i18n="navAuditLog">Audit Log</span>
         </span>
       </button>
+      <div class="sidebar-foot">
+        <div class="nav-sep"></div>
+        <button class="nav-item nav-logout" id="btn-logout-sidebar" type="button">
+          <span class="nav-item-main">
+            <svg class="nav-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            <span data-i18n="logOut">Log out</span>
+          </span>
+        </button>
+      </div>
     </nav>
 
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
@@ -2120,6 +2174,12 @@
     document.getElementById("merch-tag").textContent = countBy(merchOrders,"new");
     document.getElementById("qris-tag").textContent = countBy(qrisTransactions,"unmatched");
     document.getElementById("lora-tag").textContent = countBy(loraDevices,"online");
+    Array.prototype.forEach.call(document.querySelectorAll(".sidebar .nav-item"), function(btn){
+      var tag = btn.querySelector(".tag");
+      if (tag) tag.classList.toggle("is-zero", tag.textContent==="0");
+      var label = btn.querySelector(".nav-item-main span");
+      if (label) btn.title = label.textContent; // tooltip for the collapsed icon rail
+    });
     updateNavThumb();
   }
 
@@ -2144,11 +2204,13 @@
   function openSidebar(){
     document.querySelector(".sidebar").classList.add("open");
     document.getElementById("sidebar-overlay").classList.add("show");
+    updateNavThumb();
   }
 
   function closeSidebar(){
     document.querySelector(".sidebar").classList.remove("open");
     document.getElementById("sidebar-overlay").classList.remove("show");
+    updateNavThumb();
   }
 
   function openAccountMenu(){
@@ -3187,9 +3249,101 @@
     flashRow(flashPos);
   }
 
+  // ---------- TWO-FINGER PANE SCROLLING ----------
+  // Browsers turn a second finger into pinch-zoom or merge it into the first finger's scroll, so
+  // the sidebar and main page can't be dragged at the same time natively. When both panes are on
+  // screen (>= 600px, touch-action:none in CSS) every finger scrolls the pane it started on.
+  function initPaneTouchScroll(){
+    var wide = window.matchMedia("(min-width:600px)");
+    var drags = {};      // pointerId -> active drag
+    var coasting = [];   // momentum animations still running
+
+    function canScroll(el, axis){
+      var cs = getComputedStyle(el);
+      var ov = axis==="y" ? cs.overflowY : cs.overflowX;
+      if (ov!=="auto" && ov!=="scroll") return false;
+      return axis==="y" ? el.scrollHeight > el.clientHeight : el.scrollWidth > el.clientWidth;
+    }
+
+    // Apply to the innermost scroller that can still move this way, falling back to the pane
+    function scrollChain(start, pane, axis, delta){
+      if (!delta) return false;
+      var prop = axis==="y" ? "scrollTop" : "scrollLeft";
+      for (var el = start; el; el = el.parentElement){
+        if (canScroll(el, axis)){
+          var before = el[prop];
+          el[prop] = before + delta;
+          if (el[prop] !== before) return true;
+        }
+        if (el === pane) break;
+      }
+      return false;
+    }
+
+    function stopCoasting(pane){
+      coasting = coasting.filter(function(c){ if (c.pane===pane){ c.stopped = true; return false; } return true; });
+    }
+
+    function coast(d){
+      var c = { pane:d.pane, stopped:false };
+      coasting.push(c);
+      var vx = d.vx, vy = d.vy, last = performance.now();
+      (function step(now){
+        if (c.stopped) return;
+        var dt = Math.min(now - last, 32); last = now;
+        var movedY = scrollChain(d.start, d.pane, "y", -vy * dt);
+        var movedX = scrollChain(d.start, d.pane, "x", -vx * dt);
+        var decay = Math.pow(0.95, dt / 16);
+        vx *= decay; vy *= decay;
+        if ((!movedX && !movedY) || (Math.abs(vx) < 0.02 && Math.abs(vy) < 0.02)){ stopCoasting(d.pane); return; }
+        requestAnimationFrame(step);
+      })(last);
+    }
+
+    document.addEventListener("pointerdown", function(e){
+      if (e.pointerType==="mouse" || !wide.matches) return;
+      var pane = e.target.closest ? e.target.closest(".sidebar, .content") : null;
+      if (!pane) return;
+      stopCoasting(pane);
+      drags[e.pointerId] = { pane:pane, start:e.target, x:e.clientX, y:e.clientY, t:e.timeStamp, vx:0, vy:0, moved:false };
+    });
+
+    document.addEventListener("pointermove", function(e){
+      var d = drags[e.pointerId];
+      if (!d) return;
+      var dx = e.clientX - d.x, dy = e.clientY - d.y;
+      if (!d.moved){
+        if (Math.abs(dx) + Math.abs(dy) < 8) return; // still a tap
+        d.moved = true;
+        // Capture only once it's a drag, so taps still click the element under the finger
+        try { d.pane.setPointerCapture(e.pointerId); } catch(err){}
+      }
+      var dt = Math.max(e.timeStamp - d.t, 1);
+      scrollChain(d.start, d.pane, "y", -dy);
+      scrollChain(d.start, d.pane, "x", -dx);
+      d.vx = 0.8 * (dx / dt) + 0.2 * d.vx;
+      d.vy = 0.8 * (dy / dt) + 0.2 * d.vy;
+      d.x = e.clientX; d.y = e.clientY; d.t = e.timeStamp;
+    });
+
+    function endDrag(e){
+      var d = drags[e.pointerId];
+      if (!d) return;
+      delete drags[e.pointerId];
+      // A finger that stopped before lifting shouldn't fling
+      if (d.moved && e.type==="pointerup" && e.timeStamp - d.t < 80) coast(d);
+    }
+    document.addEventListener("pointerup", endDrag);
+    document.addEventListener("pointercancel", endDrag);
+  }
+
   // ---------- EVENTS ----------
   function attachEvents(){
-    window.addEventListener("resize", updateNavThumb);
+    initPaneTouchScroll();
+    window.addEventListener("resize", function(){
+      if (window.innerWidth > 1024) closeSidebar(); // no drawer/rail on desktop widths
+      updateNavThumb();
+    });
     window.addEventListener("resize", updateTabThumb);
     var fitTimer = null;
     window.addEventListener("resize", function(){
@@ -3568,9 +3722,13 @@
       }, 550);
     });
 
-    document.getElementById("btn-logout").addEventListener("click", function(){
-      closeAccountMenu();
-      document.getElementById("logout-overlay").hidden = false;
+    // Two ways to log out: the account menu and the bottom of the sidebar
+    ["btn-logout", "btn-logout-sidebar"].forEach(function(id){
+      document.getElementById(id).addEventListener("click", function(){
+        closeAccountMenu();
+        closeSidebar();
+        document.getElementById("logout-overlay").hidden = false;
+      });
     });
 
     document.getElementById("logout-overlay").addEventListener("click", function(e){
