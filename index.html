@@ -200,6 +200,17 @@
     .login-actions{margin-top:0; padding-top:clamp(28px, 5vh, 48px);}
     .login-foot{margin-top:auto;}
   }
+  /* Phones: a smaller logo with less space above it, so the brand, sign-in and the "powered by" footer all fit one
+     screen (the sign-in block stays at the bottom, the free space goes between it and the slogan) */
+  @media (max-width:760px){
+    .login-brand{margin-top:clamp(20px, 12vh, 140px);}
+    .login-emblem{height:clamp(88px, 17vh, 170px);}
+    .login-title{font-size:26px;}
+    .login-tagline{font-size:16px;}
+    .login-actions{padding-top:clamp(12px, 3vh, 32px); gap:clamp(10px, 1.8vh, 18px);}
+    .login-check{margin-top:0;}
+    .login-foot{margin-top:clamp(10px, 2.5vh, 24px);}
+  }
   /* Short screens (small phones, landscape): drop the access note so the rest still fits */
   @media (max-height:700px){ .login-note{display:none;} }
   .spin{
@@ -1499,9 +1510,9 @@
 
   @media (max-width:760px){
     .account-email{display:none;}
-    /* Right group fills the free space so the clock can sit centred between brand and account */
-    .topbar-right{flex:1; min-width:0;}
-    .topbar-log{padding:7px 9px; margin-inline:auto;}
+    /* The activity log button sits at the right, next to the account */
+    .topbar-right{flex:1; min-width:0; justify-content:flex-end; gap:10px;}
+    .topbar-log{padding:7px 9px;}
     .topbar-log span{display:none;}
     .content{padding:18px 14px 32px;}
 
