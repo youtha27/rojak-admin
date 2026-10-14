@@ -185,7 +185,7 @@
     .login-foot{margin-top:auto;}
   }
   /* Phones, like the riders' app: the photo is a band across the top fading into the dark, a compact logo sits
-     where it fades with the title and slogan under it, open space, then sign-in and a small footer at the bottom */
+     where it fades with the title and slogan under it, sign-in just below, and a small footer at the bottom */
   @media (max-width:760px){
     .login-slideshow{height:46%;}
     .login-scrim{height:calc(46% + 2px);
@@ -194,9 +194,10 @@
     .login-emblem{height:clamp(78px, 15vh, 140px);}
     .login-title{margin-top:clamp(10px, 2vh, 18px); font-size:22px;}
     .login-tagline{margin-top:clamp(4px, 1vh, 10px); font-size:15px;}
-    .login-actions{padding-top:clamp(16px, 4vh, 40px); gap:clamp(10px, 1.8vh, 16px);}
+    /* Sign-in follows the slogan closely; the free space goes below it, keeping the footer at the bottom */
+    .login-actions{margin-top:0; padding-top:clamp(28px, 6vh, 56px); gap:clamp(10px, 1.8vh, 16px);}
     .btn-google{min-height:52px; font-size:16px;}
-    .login-foot{margin-top:clamp(12px, 3vh, 28px);}
+    .login-foot{margin-top:auto; padding-top:16px;}
     .login-foot img{height:20px;}
   }
   /* Short screens (small phones, landscape): drop the access note so the rest still fits */
