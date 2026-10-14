@@ -974,7 +974,9 @@
   .dom-name{overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:600;}
   .dom-num{font-weight:800; font-variant-numeric:tabular-nums;}
   .dom-pct{color:var(--text-soft); text-align:right; font-variant-numeric:tabular-nums;}
-  @media (max-width:520px){ .dom-donut{flex-direction:column; height:auto;} .dom-donut svg{width:190px;} .dom-list{width:100%;} }
+  /* Phones: the donut stacks above its list, so its box grows to fit (it keeps the map's height only side by side) */
+  @media (max-width:520px){ .dom-donut{flex-direction:column; height:auto;} .dom-donut svg{width:190px;} .dom-list{width:100%;}
+    .chart-box.donut-box{height:auto;} }
   .ride-stats{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; margin-bottom:14px;}
   .ride-stat .s{font-size:11.5px; color:var(--text-soft); margin-top:2px;}
   .ride-stat{background:var(--surface-2); border-radius:var(--radius-s); padding:10px 12px;}
@@ -2896,7 +2898,7 @@
       + '<div class="card-head"><div><div class="card-title">'+esc(title)+'</div><div class="card-sub">'+esc(sub)+'</div></div>'
       + '<button type="button" class="view-toggle" data-toggle-chart="'+id+'" aria-pressed="'+showTable+'">'+(showTable ? t(id==="domicile" ? "showMap" : "showChart") : t(DONUT_CARDS[id] ? "showDonut" : "showTable"))+'</button></div>'
       + (legendHtml||"")
-      + (showTable ? (DONUT_CARDS[id] ? '<div class="chart-box '+DONUT_CARDS[id]+'">'+tableHtml+'</div>' : '<div class="mini-table-wrap">'+tableHtml+'</div>') : '<div class="chart-box'+(id==="revenue"?" tall":"")+(id==="riders"||id==="moto"?" auto":"")+(id==="domicile"?" map":"")+'" data-chart="'+id+'">'+chartHtml+'</div>')
+      + (showTable ? (DONUT_CARDS[id] ? '<div class="chart-box donut-box '+DONUT_CARDS[id]+'">'+tableHtml+'</div>' : '<div class="mini-table-wrap">'+tableHtml+'</div>') : '<div class="chart-box'+(id==="revenue"?" tall":"")+(id==="riders"||id==="moto"?" auto":"")+(id==="domicile"?" map":"")+'" data-chart="'+id+'">'+chartHtml+'</div>')
       + '</section>';
   }
 
