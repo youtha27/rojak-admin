@@ -8,8 +8,12 @@
 <link rel="preconnect" href="https://maps.googleapis.com">
 <link rel="preconnect" href="https://maps.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://router.project-osrm.org" crossorigin>
+<!-- The first screen's photo and logo, fetched right away -->
+<link rel="preload" as="image" href="assets/login-main.webp">
+<link rel="preload" as="image" href="assets/logo-jakarta.webp">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<!-- defer: the map library isn't needed to show the page (maps draw later and wait for it) -->
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <!-- Keys live in config.js (git-ignored; written from a secret on deploy) — see config.example.js -->
 <script src="config.js"></script>
 <style>
@@ -1649,17 +1653,18 @@
 
 <div class="view" id="view-login">
   <div class="login-slideshow" id="login-slideshow">
-    <!-- --fy: which part of the photo a wide screen shows; set so faces land above the logo -->
-    <div class="login-slide active" style="background-image:url('assets/login-main.jpg'); --fy:65%"></div>
-    <div class="login-slide" style="background-image:url('assets/login-1.jpg'); --fy:30%"></div>
-    <div class="login-slide" style="background-image:url('assets/login-2.jpg'); --fy:50%; background-size:130% auto"></div><!-- 130%: past the photo's white frame -->
-    <div class="login-slide" style="background-image:url('assets/login-3.jpg'); --fy:8%"></div>
-    <div class="login-slide" style="background-image:url('assets/login-4.jpg'); --fy:37%"></div>
+    <!-- --fy: which part of the photo a wide screen shows; set so faces land above the logo.
+         Only the first photo loads with the page; data-bg ones load one at a time, just before they show. -->
+    <div class="login-slide active" style="background-image:url('assets/login-main.webp'); --fy:65%"></div>
+    <div class="login-slide" data-bg="assets/login-1.webp" style="--fy:30%"></div>
+    <div class="login-slide" data-bg="assets/login-2.webp" style="--fy:50%; background-size:130% auto"></div><!-- 130%: past the photo's white frame -->
+    <div class="login-slide" data-bg="assets/login-3.webp" style="--fy:8%"></div>
+    <div class="login-slide" data-bg="assets/login-4.webp" style="--fy:37%"></div>
   </div>
   <div class="login-scrim"></div>
   <div class="login-card">
     <div class="login-brand">
-      <img class="login-emblem" src="assets/logo-jakarta.png" alt="Royal Riders Indonesia Jakarta emblem">
+      <img class="login-emblem" src="assets/logo-jakarta.webp" alt="Royal Riders Indonesia Jakarta emblem">
       <h1 class="login-title">ROJAK Admin</h1>
       <p class="login-tagline"><span>Built for the Ride,</span><span>made for the Community</span></p>
     </div>
@@ -1686,7 +1691,7 @@
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
       </button>
       <div class="brand">
-      <div class="brand-mark"><img src="assets/logo-jakarta.png" alt=""></div>
+      <div class="brand-mark"><img src="assets/logo-jakarta.webp" alt=""></div>
       <div class="brand-word">ROJAK <span>ADMIN</span></div>
       </div>
     </div>
@@ -1907,7 +1912,7 @@
   var announcements = [
     { id:3, eventId:101, postedOn:"20 Sep 2026", time:"10:00" },   // linked to the Kopdar agenda (filled from it)
     { id:1, title:"Touring Bandung — 12 Okt 2026", body:"Kumpul di SPBU Pasteur jam 06.00. Wajib bawa jas hujan dan STNK asli.", postedOn:"18 Sep 2026", time:"19:30",
-      banner:{ src:"assets/login-4.jpg", y:62 } },
+      banner:{ src:"assets/login-4.webp", y:62 } },
     { id:2, title:"Technical Meeting Bulanan", body:"Wajib hadir untuk semua ketua sub-komunitas, membahas persiapan touring Oktober.", postedOn:"15 Sep 2026", time:"09:15" }
   ];
 
@@ -1916,7 +1921,7 @@
   // and nobody pays: participants is just who's coming. Ids start at 101 so they never clash with touring ids.
   var agenda = [
     { id:101, kind:"agenda", name:"Kopdar Bulanan — September", desc:"Kopdar rutin bulanan: evaluasi kegiatan bulan ini dan rencana touring berikutnya.", scheduledFor:"28 Sep 2026", time:"19:00", status:"active", riders:24,
-      banner:{ src:"assets/login-3.jpg", y:45 },
+      banner:{ src:"assets/login-3.webp", y:45 },
       itinerary:[
         { id:1, day:1, time:"19:00", activity:"Kumpul & ngopi", location:"Warung Kopi RE, Kemang" },
         { id:2, day:1, time:"19:30", activity:"Evaluasi kegiatan & rencana touring", location:"Warung Kopi RE, Kemang" }
@@ -1956,7 +1961,7 @@
   // transfer (same payment states as memberships). Completed tours keep a plain participant list.
   var touringRoutes = [
     { id:1, name:"Jakarta – Bandung via Puncak", desc:"Touring 3 hari ke Bandung lewat jalur Puncak: menginap di Bandung, riding santai ke Lembang, pulang lewat Tol Cipularang. Ada paket towing pulang-pergi.", scheduledFor:"12 Okt 2026", time:"06:30", status:"inactive", riders:52,
-      banner:{ src:"assets/login-1.jpg", y:8 },
+      banner:{ src:"assets/login-1.webp", y:8 },
       groups:[ { id:1, name:"Grup A" }, { id:2, name:"Grup B" }, { id:3, name:"Grup C" }, { id:4, name:"Grup D" } ],
       packages:[
         { id:1, name:"Paket Sultan", desc:"Kamar Private - PP Towing", price:11500000 },
@@ -2199,17 +2204,17 @@
   // directory and the touring list: approved members (who, where, which bike, when they joined) and the riders
   // of completed tourings. Each member's ride stats (km, time, tours) come from the tourings they rode.
   var MOTO_IMAGES = {
-    "Classic 350":"assets/bikes/classic-350.png", "Meteor 350":"assets/bikes/meteor-350.png", "Hunter 350":"assets/bikes/hunter-350.png",
-    "Himalayan 452":"assets/bikes/himalayan-452.png", "Interceptor 650":"assets/bikes/interceptor-650.png",
-    "Super Meteor 650":"assets/bikes/super-meteor-650.png", "Classic 650":"assets/bikes/classic-650.png",
-    "Guerilla 452":"assets/bikes/guerilla-452.png", "Shotgun 650":"assets/bikes/shotgun-650.png",
+    "Classic 350":"assets/bikes/classic-350.webp", "Meteor 350":"assets/bikes/meteor-350.webp", "Hunter 350":"assets/bikes/hunter-350.webp",
+    "Himalayan 452":"assets/bikes/himalayan-452.webp", "Interceptor 650":"assets/bikes/interceptor-650.webp",
+    "Super Meteor 650":"assets/bikes/super-meteor-650.webp", "Classic 650":"assets/bikes/classic-650.webp",
+    "Guerilla 452":"assets/bikes/guerilla-452.webp", "Shotgun 650":"assets/bikes/shotgun-650.webp",
     // older models some members still ride
-    "Continental GT 650":"assets/bikes/continental-gt-650.png", "Himalayan 450":"assets/bikes/himalayan-450.png", "Scram 411":"assets/bikes/scram-411.png",
+    "Continental GT 650":"assets/bikes/continental-gt-650.webp", "Himalayan 450":"assets/bikes/himalayan-450.webp", "Scram 411":"assets/bikes/scram-411.webp",
     // ready for when members register them
-    "Bullet 350":"assets/bikes/bullet-350.png", "Goan Classic 350":"assets/bikes/goan-classic-350.png", "Bear 650":"assets/bikes/bear-650.png",
+    "Bullet 350":"assets/bikes/bullet-350.webp", "Goan Classic 350":"assets/bikes/goan-classic-350.webp", "Bear 650":"assets/bikes/bear-650.webp",
     // one picture for the older 500s, under every name a member might register them as
-    "Classic 500":"assets/bikes/classic-500-thunderbird.png", "Thunderbird 500":"assets/bikes/classic-500-thunderbird.png",
-    "Thunderbird 350":"assets/bikes/classic-500-thunderbird.png", "Thunderbird 500X":"assets/bikes/classic-500-thunderbird.png"
+    "Classic 500":"assets/bikes/classic-500-thunderbird.webp", "Thunderbird 500":"assets/bikes/classic-500-thunderbird.webp",
+    "Thunderbird 350":"assets/bikes/classic-500-thunderbird.webp", "Thunderbird 500X":"assets/bikes/classic-500-thunderbird.webp"
   };
   function motoModel(m){ return (m.moto || "").replace(/^Royal Enfield /, ""); }
   function approvedMembers(){ return members.filter(function(m){ return m.status==="approved"; }); }
@@ -5904,6 +5909,16 @@
   var GOOGLE_MAPS_KEY = (window.ROJAK_CONFIG && window.ROJAK_CONFIG.googleMapsKey) || "";
   var gmaps = { status: GOOGLE_MAPS_KEY ? "idle" : "off" };   // off | idle | loading | ready | failed
 
+  // The Leaflet library loads after the page (defer): until then a map waits for it rather than saying it's offline,
+  // and is drawn once it arrives
+  function leafletPending(){
+    if (window.L || document.readyState === "complete") return false;
+    if (!leafletPending.hooked){
+      leafletPending.hooked = true;
+      window.addEventListener("load", function(){ initTouringMaps(); initDomicileMaps(); });
+    }
+    return true;
+  }
   function loadGoogleMaps(){
     if (gmaps.status!=="idle") return;
     gmaps.status = "loading";
@@ -5929,7 +5944,7 @@
         return;
       }
       if (gmaps.status==="ready"){ drawGoogleMap(el, tr); return; }
-      if (!window.L){ el.innerHTML = '<div class="map-msg">'+t("mapOffline")+'</div>'; return; }
+      if (!window.L){ el.innerHTML = '<div class="map-msg">'+t(leafletPending() ? "mapLoading" : "mapOffline")+'</div>'; return; }
       drawTouringMap(el, tr);
     });
   }
@@ -6115,7 +6130,7 @@
       var areas = domicileAreas(communityMetrics().byDomicile);
       if (gmaps.status==="ready") drawDomicileGoogle(el, areas);
       else if (window.L) drawDomicileLeaflet(el, areas);
-      else { el.innerHTML = '<div class="map-msg">'+t("mapOffline")+'</div>'; return; }
+      else { el.innerHTML = '<div class="map-msg">'+t(leafletPending() ? "mapLoading" : "mapOffline")+'</div>'; return; }
       el.setAttribute("data-drawn", domicileMapKey());
     });
   }
@@ -8685,14 +8700,30 @@
     setTimeout(function(){ location.reload(); }, 800);
   }
 
+  // Only the first photo comes with the page: each next one is fetched in the background a few seconds before it
+  // shows, and shown only once it has arrived (so a slow connection never fades to an empty slide).
   function startLoginSlideshow(){
     var slides = document.querySelectorAll("#login-slideshow .login-slide");
     if (slides.length < 2) return;
+    var ready = function(slide){ return !slide.getAttribute("data-bg"); };
+    var fetchSlide = function(slide){
+      var src = slide.getAttribute("data-bg");
+      if (!src || slide._loading) return;
+      slide._loading = true;
+      var img = new Image();
+      img.onload = function(){ slide.style.backgroundImage = "url('" + src + "')"; slide.removeAttribute("data-bg"); };
+      img.onerror = function(){ slide._loading = false; };
+      img.src = src;
+    };
     var idx = 0;
+    setTimeout(function(){ fetchSlide(slides[1]); }, 1500);   // after the page itself has loaded
     setInterval(function(){
+      var next = (idx + 1) % slides.length;
+      if (!ready(slides[next])){ fetchSlide(slides[next]); return; }   // not arrived yet: keep this one a bit longer
       slides[idx].classList.remove("active");
-      idx = (idx + 1) % slides.length;
+      idx = next;
       slides[idx].classList.add("active");
+      fetchSlide(slides[(idx + 1) % slides.length]);
     }, 4500);
   }
 
