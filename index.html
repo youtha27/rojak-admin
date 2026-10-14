@@ -170,24 +170,8 @@
   .btn-google:focus-visible{outline:2px solid var(--accent); outline-offset:3px;}
   .g-mark{width:22px; height:22px; flex:none;}
 
-  .login-check{
-    display:flex; align-items:flex-start; gap:14px;
-    margin-top:clamp(0px, 1.4vh, 14px);
-    font-size:14px; line-height:1.5; color:rgba(255,255,255,0.72); cursor:pointer;
-  }
-  .login-check input{
-    appearance:none; -webkit-appearance:none; flex:none;
-    width:22px; height:22px; margin:0; border-radius:4px;
-    border:2px solid rgba(255,255,255,0.45); background:transparent; cursor:pointer;
-  }
-  .login-check input:checked{
-    border-color:var(--accent);
-    background:var(--accent) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7'/%3E%3C/svg%3E") center/16px no-repeat;
-  }
-  .login-check input:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
-  .login-link{color:#fff; text-decoration:underline; text-underline-offset:2px;}
   .login-note{
-    margin:0 0 0 36px;
+    margin:0; text-align:center;
     font-size:12px; line-height:1.5; color:rgba(255,255,255,0.45);
   }
   .login-foot{
@@ -200,16 +184,20 @@
     .login-actions{margin-top:0; padding-top:clamp(28px, 5vh, 48px);}
     .login-foot{margin-top:auto;}
   }
-  /* Phones: a smaller logo with less space above it, so the brand, sign-in and the "powered by" footer all fit one
-     screen (the sign-in block stays at the bottom, the free space goes between it and the slogan) */
+  /* Phones, like the riders' app: the photo is a band across the top fading into the dark, a compact logo sits
+     where it fades with the title and slogan under it, open space, then sign-in and a small footer at the bottom */
   @media (max-width:760px){
-    .login-brand{margin-top:clamp(20px, 12vh, 140px);}
-    .login-emblem{height:clamp(88px, 17vh, 170px);}
-    .login-title{font-size:26px;}
-    .login-tagline{font-size:16px;}
-    .login-actions{padding-top:clamp(12px, 3vh, 32px); gap:clamp(10px, 1.8vh, 18px);}
-    .login-check{margin-top:0;}
-    .login-foot{margin-top:clamp(10px, 2.5vh, 24px);}
+    .login-slideshow{height:46%;}
+    .login-scrim{height:calc(46% + 2px);
+      background:linear-gradient(180deg, rgba(19,26,26,0.05) 0%, rgba(19,26,26,0.25) 45%, rgba(19,26,26,0.75) 75%, var(--login-bg) 100%);}
+    .login-brand{margin-top:clamp(40px, 23vh, 230px);}
+    .login-emblem{height:clamp(78px, 15vh, 140px);}
+    .login-title{margin-top:clamp(10px, 2vh, 18px); font-size:22px;}
+    .login-tagline{margin-top:clamp(4px, 1vh, 10px); font-size:15px;}
+    .login-actions{padding-top:clamp(16px, 4vh, 40px); gap:clamp(10px, 1.8vh, 16px);}
+    .btn-google{min-height:52px; font-size:16px;}
+    .login-foot{margin-top:clamp(12px, 3vh, 28px);}
+    .login-foot img{height:20px;}
   }
   /* Short screens (small phones, landscape): drop the access note so the rest still fits */
   @media (max-height:700px){ .login-note{display:none;} }
@@ -1682,10 +1670,6 @@
       </svg>
       <span id="signin-label" data-i18n="signIn">Continue with Google</span>
     </button>
-    <label class="login-check">
-      <input type="checkbox" id="login-consent" checked>
-      <span><span data-i18n="loginConsentPre">By signing in, you agree to our</span> <a href="#" class="login-link" data-i18n="loginPrivacy">Privacy Policy</a><span data-i18n="loginConsentPost">.</span></span>
-    </label>
     <p class="login-note" data-i18n="loginNote">Access is restricted to authorized Rojak admins. If you believe this is a mistake, contact a core team member.</p>
     </div>
     <div class="login-foot"><img src="assets/powered-intiva.png" alt="Powered by Intiva"></div>
@@ -2920,7 +2904,6 @@
       loginSub: "Member verification for Royal Riders Indonesia Jakarta",
       signIn: "Continue with Google",
       signingIn: "Signing in…",
-      loginConsentPre: "By signing in, you agree to our", loginPrivacy: "Privacy Policy", loginConsentPost: ".",
       loginNote: "Access is restricted to authorized Rojak admins. If you believe this is a mistake, contact a core team member.",
       roleBadge: "Core Team Admin",
       themeDark: "Dark",
@@ -3164,7 +3147,6 @@
       loginSub: "Verifikasi anggota untuk Royal Riders Indonesia Jakarta",
       signIn: "Lanjutkan dengan Google",
       signingIn: "Sedang masuk…",
-      loginConsentPre: "Dengan masuk, Anda menyetujui", loginPrivacy: "Kebijakan Privasi", loginConsentPost: " kami.",
       loginNote: "Akses hanya untuk admin Rojak yang berwenang. Jika menurut Anda ini keliru, hubungi anggota core team.",
       roleBadge: "Admin Tim Inti",
       themeDark: "Gelap",
@@ -8496,10 +8478,6 @@
 
     document.getElementById("btn-reset-data").addEventListener("click", function(){ closeAccountMenu(); resetSavedData(); });
 
-    // Signing in needs the privacy consent ticked
-    var consent = document.getElementById("login-consent");
-    consent.addEventListener("change", function(){ document.getElementById("btn-signin").disabled = !consent.checked; });
-    document.querySelector("#view-login .login-link").addEventListener("click", function(e){ e.preventDefault(); });
 
     document.getElementById("btn-signin").addEventListener("click", function(){
       var label = document.getElementById("signin-label");
@@ -8543,7 +8521,7 @@
           document.getElementById("view-app").hidden = true;
           document.getElementById("view-login").hidden = false;
           var btn = document.getElementById("btn-signin");
-          btn.disabled = !document.getElementById("login-consent").checked;
+          btn.disabled = false;
           document.getElementById("signin-label").textContent = t("signIn");
           confirmBtn.classList.remove("btn-reacting");
           confirmBtn.innerHTML = originalHtml;
