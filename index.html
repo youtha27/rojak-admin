@@ -338,7 +338,7 @@
   .account{position:relative; display:flex; align-items:center;}
   .avatar{
     width:28px; height:28px; border-radius:50%;
-    background:var(--accent); color:var(--accent-ink);
+    background:var(--accent); color:#fff;
     display:flex; align-items:center; justify-content:center;
     font-weight:700; font-size:12px; flex:none;
   }
@@ -521,19 +521,7 @@
   .dashboard-activity-desc{flex:1; min-width:160px; font-size:13px; font-weight:500; color:var(--text);}
 
   /* ---------- DASHBOARD METRICS ---------- */
-  .dash-filters{display:flex; align-items:center; gap:10px; margin-bottom:16px; flex-wrap:wrap;}
-  .dash-filters .tabs{margin-bottom:0;}
-  .dash-filters .tab.active{background:var(--surface-2); border-color:var(--line);}
 
-  .kpi-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(165px,1fr)); gap:12px; margin-bottom:14px;}
-  .kpi{
-    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-m);
-    box-shadow:var(--shadow-card); padding:16px 18px; display:flex; flex-direction:column; gap:6px; min-width:0;
-  }
-  .kpi-label{font-size:12px; font-weight:600; color:var(--text-soft);}
-  .kpi-value{font-size:26px; font-weight:800; letter-spacing:-.01em; color:var(--text); line-height:1.1;}
-  .kpi.hero .kpi-value{font-size:40px;}
-  .kpi.hero{grid-column:span 2;}
   .kpi-sub{font-size:12px; color:var(--text-soft); font-weight:500; display:flex; gap:6px; align-items:center; flex-wrap:wrap;}
   .delta{font-weight:700; display:inline-flex; align-items:center; gap:2px;}
   .delta.up{color:var(--good-text);}
@@ -548,6 +536,12 @@
   .card-head{display:flex; align-items:flex-start; justify-content:space-between; gap:12px;}
   .card-title{font-size:14px; font-weight:800; color:var(--text);}
   .card-sub{font-size:12px; color:var(--text-soft); font-weight:500; margin-top:2px;}
+  /* Switching a card's view: the old view fades down and out, the new one rises in (see switchCardView) */
+  @media (prefers-reduced-motion: no-preference){
+    .card.view-out > :not(.card-head){opacity:0; transform:translateY(4px); transition:opacity .14s ease, transform .14s ease;}
+    .card.view-in > :not(.card-head){animation:cardViewIn .32s cubic-bezier(.2,.8,.2,1) both;}
+  }
+  @keyframes cardViewIn{ from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:none;} }
   .view-toggle{
     flex:none; background:none; border:1px solid var(--line); color:var(--text-soft);
     font-size:11.5px; font-weight:700; padding:5px 10px; border-radius:999px; cursor:pointer;
@@ -603,11 +597,6 @@
     .chart-grid{grid-template-columns:1fr;}
   }
   @media (max-width:760px){
-    .kpi-grid{grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px;}
-    .kpi.hero{grid-column:1 / -1;}
-    .kpi.hero .kpi-value{font-size:30px;}
-    .kpi{padding:14px;}
-    .kpi-value{font-size:22px;}
     .kpi-sub{font-size:11.5px;}
     .card{padding:14px 14px 10px;}
     .chart-box{height:220px;}
@@ -854,6 +843,11 @@
   .detail-section-title{font-size:10px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--text-soft); margin-bottom:8px;}
   .garage-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:10px;}
   .garage-card{display:flex; align-items:center; gap:12px; background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-m); padding:10px 12px;}
+  /* Garage bike picture: a member's photo fills it; a stock model picture sits inside it; the icon shows if neither loads */
+  .garage-bike{position:relative; width:76px; height:52px; flex:none; border-radius:10px; overflow:hidden;
+    background:var(--accent-soft); color:var(--accent-2-text); display:flex; align-items:center; justify-content:center;}
+  .garage-bike-img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; background:var(--surface-2);}
+  .garage-bike-img.is-stock{object-fit:contain; padding:4px;}
   .garage-name{font-size:13px; font-weight:700; color:var(--text);}
   .garage-plate{font-size:12px; font-weight:700; color:var(--accent-2-text); font-variant-numeric:tabular-nums;}
   .garage-empty{font-size:12.5px; font-weight:500; color:var(--text-soft);}
@@ -861,7 +855,6 @@
   .person{display:flex; align-items:center; gap:10px; background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-m); padding:8px 12px;}
   .person-main{flex:1; min-width:0;}
   .person-main .cell-name, .person-main .cell-sub{white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-  .avatar{width:32px; height:32px; border-radius:50%; flex:none; display:flex; align-items:center; justify-content:center; background:var(--series-1); color:#fff; font-size:13px; font-weight:800;}
   .chip.lead{background:none; box-shadow:inset 0 0 0 1px var(--accent); color:var(--accent-2-text);}
   .chip.plain{background:none; box-shadow:inset 0 0 0 1px var(--line); color:var(--text-soft);}
   .people-more{font-size:12px; font-weight:600; color:var(--text-soft); margin-top:8px;}
@@ -877,6 +870,12 @@
   .lb-avatar{position:relative; flex:none; display:flex; align-items:center; justify-content:center; border-radius:50%;
     background:var(--line); color:var(--text); font-weight:800; box-shadow:0 0 0 3px var(--lb-ring, var(--line));}
   .lb-avatar.sm{width:30px; height:30px; font-size:13px; box-shadow:none;}
+  /* A real photo covers the initial (which shows again if the photo fails to load) */
+  .pfp-photo{position:absolute; inset:0; width:100%; height:100%; border-radius:50%; object-fit:cover; display:block;}
+  .avatar{position:relative;}
+  /* A person's picture beside their name in tables and lists (same circle as the leaderboard) */
+  .cell-person{display:flex; align-items:center; gap:10px; min-width:0;}
+  .cell-person-main{min-width:0;}
   .lb-medal{position:absolute; right:-4px; bottom:-4px; width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center;
     background:var(--lb-ring); color:#1c1c1e; font-size:11.5px; font-weight:800; box-shadow:0 0 0 2px var(--surface);}
   .lb-gold{--lb-ring:#E9B824;} .lb-silver{--lb-ring:#B5BDC7;} .lb-bronze{--lb-ring:#C8803F;}
@@ -884,6 +883,12 @@
   .lb-spot .lb-km{font-weight:800; font-size:18px; color:var(--text); font-variant-numeric:tabular-nums;}
   .lb-spot.is-first .lb-km{font-size:22px;}
   .lb-meta{font-size:11.5px; color:var(--text-soft); max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  /* Rider's bike: a soft light pool behind it so dark bikes still read on the dark card */
+  .lb-bike{display:block; flex:none; width:52px; height:32px;
+    background:radial-gradient(ellipse 60% 55% at 50% 60%, color-mix(in srgb, var(--text) 13%, transparent), transparent 75%);}
+  .lb-bike img{width:100%; height:100%; object-fit:contain; display:block;}
+  .lb-spot .lb-bike{width:84px; height:50px; margin:4px 0 2px;}
+  .lb-spot.is-first .lb-bike{width:96px; height:58px;}
   .lb-step{width:100%; margin-top:10px; border-radius:8px 8px 0 0; height:34px;
     background:linear-gradient(180deg, color-mix(in srgb, var(--lb-ring) 38%, transparent), color-mix(in srgb, var(--lb-ring) 8%, transparent));
     border-top:3px solid var(--lb-ring);}
@@ -891,16 +896,42 @@
   .lb-silver .lb-step{height:42px;}
   @media (prefers-reduced-motion: no-preference){
     .lb-intro .lb-step{transform-origin:bottom; animation:lbRise .6s cubic-bezier(.2,.8,.2,1) var(--lb-delay) both;}
-    .lb-intro .lb-spot > :not(.lb-step){animation:lbDrop .5s cubic-bezier(.2,.9,.3,1.2) calc(var(--lb-delay) + 300ms) both;}
+    .lb-intro .lb-spot > :not(.lb-step, .lb-sparks){animation:lbDrop .5s cubic-bezier(.2,.9,.3,1.2) calc(var(--lb-delay) + 300ms) both;}
     .lb-intro .lb-medal{animation:lbPop .45s cubic-bezier(.3,1.6,.5,1) calc(var(--lb-delay) + 650ms) both;}
     .lb-intro .lb-spot.is-first .lb-avatar{animation:lbDrop .5s cubic-bezier(.2,.9,.3,1.2) calc(var(--lb-delay) + 300ms) both, lbGlow 1.4s ease calc(var(--lb-delay) + 800ms) 1;}
   }
+  /* Hovering a podium spot: the ring glows and the step brightens; with motion allowed the whole stack rises with
+     the step and the medal pops. Uses translate/scale (not transform), which the intro animation holds. */
+  @media (hover:hover){
+    .lb-spot{cursor:default;}
+    .lb-spot > :not(.lb-step, .lb-sparks){transition:translate .3s cubic-bezier(.2,.8,.2,1);}
+    .lb-spot .lb-avatar{transition:box-shadow .25s ease, translate .3s cubic-bezier(.2,.8,.2,1);}
+    .lb-spot .lb-medal{transition:scale .25s cubic-bezier(.3,1.6,.5,1);}
+    .lb-spot .lb-step{transition:filter .25s ease;}
+    .lb-spot:hover .lb-avatar{box-shadow:0 0 0 3px var(--lb-ring), 0 0 0 8px color-mix(in srgb, var(--lb-ring) 28%, transparent);}
+    .lb-spot:hover .lb-step{filter:brightness(1.25) saturate(1.1);}
+  }
+  @media (hover:hover) and (prefers-reduced-motion: no-preference){
+    /* The whole stack (avatar, name, km, bike, model line) rises together */
+    .lb-spot:hover > :not(.lb-step, .lb-sparks){translate:0 -6px;}
+    .lb-spot:hover .lb-medal{scale:1.15;}
+    /* The step rises a little (scale, which the intro's transform leaves free) */
+    .lb-spot .lb-step{transition:filter .25s ease, scale .35s cubic-bezier(.2,.8,.2,1); transform-origin:bottom;}
+    .lb-spot:hover .lb-step{scale:1 1.18;}
+  }
+  /* Sparks from behind a podium avatar on hover (made by sparkPodium): they shoot up in a V to --dx/--dy and fade.
+     The avatar sits above them, so they appear from behind it. */
+  .lb-spot{position:relative;}
+  /* Above the sparks, and solid (the usual see-through tint laid over the card colour) so they can't show through */
+  .lb-spot .lb-avatar{z-index:2; background:linear-gradient(var(--line), var(--line)), var(--surface);}
+  /* The sparks' canvas (drawn by startPodiumSparks), behind the avatar; placed and sized from script */
+  .lb-sparks{position:absolute; z-index:1; pointer-events:none;}
   @keyframes lbRise{ from{transform:scaleY(0); opacity:0;} to{transform:scaleY(1); opacity:1;} }
   @keyframes lbDrop{ from{transform:translateY(-18px); opacity:0;} to{transform:none; opacity:1;} }
   @keyframes lbPop{ 0%{transform:scale(0);} 100%{transform:scale(1);} }
   @keyframes lbGlow{ 0%,100%{box-shadow:0 0 0 3px var(--lb-ring);} 40%{box-shadow:0 0 0 3px var(--lb-ring), 0 0 0 12px color-mix(in srgb, var(--lb-ring) 30%, transparent);} }
   .lb-list{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:2px; border-top:1px solid var(--line); padding-top:8px;}
-  .lb-row{display:grid; grid-template-columns:26px 30px minmax(0,1.2fr) minmax(60px,2fr) 72px; align-items:center; gap:10px; padding:6px 8px; border-radius:8px;}
+  .lb-row{display:grid; grid-template-columns:26px 30px 52px minmax(0,1.2fr) minmax(60px,2fr) 72px; align-items:center; gap:10px; padding:6px 8px; border-radius:8px;}
   .lb-row:hover{background:var(--line);}
   .lb-rank{font-weight:800; color:var(--text-soft); text-align:center; font-variant-numeric:tabular-nums;}
   .lb-who{min-width:0;}
@@ -909,7 +940,10 @@
   .lb-fill{height:100%; border-radius:4px; background:var(--accent); transition:width .6s ease;}
   .lb-row .lb-km{font-weight:800; font-size:13px; color:var(--text); text-align:right; font-variant-numeric:tabular-nums;}
   @media (max-width:560px){
-    .lb-row{grid-template-columns:22px 28px minmax(0,1fr) 64px;}
+    .lb-row{grid-template-columns:22px 28px 44px minmax(0,1fr) auto; gap:8px;}
+    .lb-row .lb-km{white-space:nowrap;}
+    .lb-row .lb-bike{width:44px; height:27px;}
+    .lb-spot .lb-bike{width:64px; height:38px;} .lb-spot.is-first .lb-bike{width:74px; height:44px;}
     .lb-bar{display:none;}
     .lb-spot .lb-avatar{width:46px; height:46px;} .lb-spot.is-first .lb-avatar{width:56px; height:56px;}
     .lb-spot .lb-km{font-size:15px;} .lb-spot.is-first .lb-km{font-size:18px;}
@@ -941,7 +975,8 @@
   .dom-num{font-weight:800; font-variant-numeric:tabular-nums;}
   .dom-pct{color:var(--text-soft); text-align:right; font-variant-numeric:tabular-nums;}
   @media (max-width:520px){ .dom-donut{flex-direction:column; height:auto;} .dom-donut svg{width:190px;} .dom-list{width:100%;} }
-  .ride-stats{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin-bottom:14px;}
+  .ride-stats{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; margin-bottom:14px;}
+  .ride-stat .s{font-size:11.5px; color:var(--text-soft); margin-top:2px;}
   .ride-stat{background:var(--surface-2); border-radius:var(--radius-s); padding:10px 12px;}
   .ride-stat .k{font-size:10px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--accent-2-text);}
   .ride-stat .v{font-size:18px; font-weight:800; color:var(--text); font-variant-numeric:tabular-nums; margin-top:2px;}
@@ -971,10 +1006,10 @@
   .map-layers button{font:inherit; font-size:11.5px; font-weight:700; color:var(--text-soft); background:none; border:none; padding:5px 10px; border-radius:6px; cursor:pointer;}
   .map-layers button:hover{color:var(--text); background:var(--surface-2);}
   .map-layers button.is-active{background:var(--accent); color:var(--accent-ink);}
-  .touring-map .leaflet-bar{border:1px solid var(--line); box-shadow:0 2px 8px rgba(0,0,0,.25);}
-  .touring-map .leaflet-bar a{background:var(--surface); color:var(--text); border-bottom-color:var(--line);}
-  .touring-map .leaflet-bar a:hover{background:var(--surface-2); color:var(--accent-2-text);}
-  .touring-map .leaflet-bar a.leaflet-disabled{background:var(--surface); color:var(--text-soft); opacity:.5;}
+  .touring-map .leaflet-bar, .domicile-map .leaflet-bar{border:1px solid var(--line); box-shadow:0 2px 8px rgba(0,0,0,.25);}
+  .touring-map .leaflet-bar a, .domicile-map .leaflet-bar a{background:var(--surface); color:var(--text); border-bottom-color:var(--line);}
+  .touring-map .leaflet-bar a:hover, .domicile-map .leaflet-bar a:hover{background:var(--surface-2); color:var(--accent-2-text);}
+  .touring-map .leaflet-bar a.leaflet-disabled, .domicile-map .leaflet-bar a.leaflet-disabled{background:var(--surface); color:var(--text-soft); opacity:.5;}
   .map-recenter a{display:flex !important; align-items:center; justify-content:center;}
   .touring-map .leaflet-control-attribution{background:var(--surface); color:var(--text-soft); opacity:.85; border-top-left-radius:6px;}
   .touring-map .leaflet-control-attribution a{color:var(--accent-2-text);}
@@ -988,6 +1023,19 @@
   .gmap-recenter{width:40px; height:40px; display:flex; align-items:center; justify-content:center; cursor:pointer;
     background:var(--surface); color:var(--text); border:1px solid var(--line); border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,.25);}
   .gmap-recenter:hover{color:var(--accent-2-text);}
+  /* Google maps' zoom buttons, drawn here so they follow the theme like the recenter button */
+  .gmap-zoom{width:40px; display:flex; flex-direction:column; background:var(--surface); border:1px solid var(--line); border-radius:8px;
+    box-shadow:0 2px 8px rgba(0,0,0,.25); overflow:hidden;}
+  .gmap-zoom button{width:100%; height:39px; display:flex; align-items:center; justify-content:center; cursor:pointer;
+    background:none; border:0; padding:0; color:var(--text);}
+  .gmap-zoom button + button{border-top:1px solid var(--line);}
+  .gmap-zoom button:hover{background:var(--surface-2); color:var(--accent-2-text);}
+  .gmap-zoom button:disabled{color:var(--text-soft); opacity:.5; cursor:default; background:none;}
+  /* Google's attribution strip in the page theme; it stays fully shown and readable, only the colours change */
+  :is(.touring-map, .domicile-map) .gm-style-cc > div:first-child{opacity:.85 !important;}
+  :is(.touring-map, .domicile-map) .gm-style-cc > div:first-child > div:last-child{background-color:var(--surface) !important;}
+  :is(.touring-map, .domicile-map) .gm-style-cc, :is(.touring-map, .domicile-map) .gm-style-cc *{color:var(--text-soft) !important;}
+  :is(.touring-map, .domicile-map) .gm-style-cc a:hover{color:var(--text) !important;}
   .touring-map .gm-style{font-family:inherit;}
   .touring-map .gm-style .gm-style-iw-c{background:var(--surface); color:var(--text); border:1px solid var(--line); box-shadow:0 6px 18px rgba(0,0,0,.35);}
   .touring-map .gm-style .gm-style-iw-d{color:var(--text); overflow:auto !important;}
@@ -1387,7 +1435,7 @@
     .itin-table tbody tr td.itin-cell-route > *, .itin-table tbody tr td.itin-cell-del > *{flex:none;}
     .receipt{max-width:320px;}
     .profile-detail{padding-left:20px; padding-right:16px;}
-    .ride-stats{grid-template-columns:1fr;}
+    .ride-stats{grid-template-columns:repeat(2,minmax(0,1fr));}
   }
 
   /* Phones and folded foldables: sidebar is a slide-out drawer */
@@ -1556,6 +1604,17 @@
   tbody > tr.rowwin-enter > td{animation:rowwin-in .18s ease;}
   @keyframes rowwin-fade{from{background:rgba(0,0,0,0);}}
   @keyframes rowwin-in{from{opacity:0; transform:translateY(10px);}}
+  /* Pop-up windows (activity log, participants, itinerary, log out…) open the same way: the backdrop fades in and
+     the window rises in. Closing (.is-closing, and .rowwin-leave for the details windows) only fades, without moving. */
+  @media (prefers-reduced-motion: no-preference){
+    .modal-overlay:not(.is-hosted){animation:rowwin-fade .18s ease;}
+    .modal-overlay:not(.is-hosted) > .modal-card{animation:modal-in .22s cubic-bezier(.2,.8,.2,1);}
+    .modal-overlay.is-closing, tbody > tr.rowwin-leave{animation:modal-fade-out .16s ease forwards;}
+    .modal-overlay.is-closing > .modal-card, tbody > tr.rowwin-leave > td{animation:modal-out .16s ease forwards;}
+  }
+  @keyframes modal-in{from{opacity:0; transform:translateY(12px) scale(.98);}}
+  @keyframes modal-out{to{opacity:0;}}   /* closing only fades: no movement on the way out */
+  @keyframes modal-fade-out{to{background:rgba(0,0,0,0);}}
 
   .rowwin-head{
     position:sticky; top:0; z-index:5;
@@ -2185,7 +2244,7 @@
     var today = dateOf(TODAY), from = addDays(today, -(range || 30));
     var riders = approved.filter(function(m){ return m.stats.km > 0; })
       .sort(function(a, b){ return b.stats.km - a.stats.km || b.stats.tours - a.stats.tours; }).slice(0, 10)
-      .map(function(m){ return { label:m.name, count:m.stats.km, moto:motoModel(m), tours:m.stats.tours }; });
+      .map(function(m){ return { label:m.name, photo:photoOf(m), count:m.stats.km, moto:motoModel(m), motoImg:MOTO_IMAGES[motoModel(m)], tours:m.stats.tours }; });
     return {
       active: approved.length,
       approvedInRange: approved.filter(function(m){ var d = dateOf(m.decidedOn); return d && d > from && d <= today; }).length,
@@ -2350,6 +2409,7 @@
     return order.map(function(k){ return map[k]; });
   }
 
+  var DASH_RANGE_DAYS = 30;   // the dashboard's fixed period ("+N approved in the last 30 days")
   function getMetrics(range){
     var bucket = range > 30 ? "week" : "day";
     var curRev = dailyRevenue.slice(METRIC_DAYS - range);
@@ -2637,6 +2697,99 @@
     }).join("") + '</div>';
   }
 
+  // Sparks from a podium avatar while the mouse is on its spot: V's, each arm starting at the avatar's lower-left /
+  // lower-right edge (from behind it) and shooting up and out, so the V frames the picture. A new V every 90 ms,
+  // each a little wider than the last (cycling through 7) — dots and four-point stars in the spot's medal colour,
+  // white and the accent. Leaving, or 5 s of hovering, stops new ones; those in flight finish (hovering again
+  // restarts them). Mouse only (not a tap), not with reduced motion. Drawn on one small canvas behind the avatar:
+  // a few dozen moving page elements were slow on weak computers.
+  var SPARK_WAVES = 7, SPARK_WAVE_GAP_MS = 90, SPARK_MAX_MS = 5000, SPARK_PAD = 130;   // canvas reaches this far around the avatar
+  function startPodiumSparks(spot){
+    if (!window.matchMedia || !window.matchMedia("(hover:hover)").matches || calmMotion()) return;
+    var avatar = spot.querySelector(".lb-avatar");
+    if (!avatar) return;
+    var fx = spot._sparks;
+    if (fx){ fx.emitting = true; fx.startedAt = performance.now(); return; }   // still drawing (maybe winding down): keep going
+    var r = avatar.offsetWidth / 2;
+    var cx = avatar.offsetLeft + r, cy = avatar.offsetTop + r - 6;   // where the avatar rises to on hover
+    var dpr = Math.min(2, window.devicePixelRatio || 1), W = SPARK_PAD * 2, H = SPARK_PAD + 40;
+    var canvas = document.createElement("canvas");
+    canvas.className = "lb-sparks";
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    canvas.style.cssText = "width:"+W+"px; height:"+H+"px; left:"+(cx - SPARK_PAD)+"px; top:"+(cy - SPARK_PAD + 10)+"px;";
+    spot.appendChild(canvas);
+    var ctx = canvas.getContext("2d");
+    ctx.scale(dpr, dpr);
+    fx = spot._sparks = {
+      emitting:true, startedAt:performance.now(), wave:0, lastWave:-1e9, particles:[],
+      ox:SPARK_PAD, oy:SPARK_PAD - 10, r:r,                    // the avatar's centre, in canvas coordinates
+      first:spot.classList.contains("is-first"),
+      colors:[cssVarOf(spot, "--lb-ring", "#E9B824"), "#ffffff", cssVar("--accent", "#FF6A00")]
+    };
+    var frame = function(now){
+      if (!spot.isConnected){ spot._sparks = null; return; }   // the dashboard was redrawn under the mouse
+      if (fx.emitting && now - fx.startedAt > SPARK_MAX_MS) fx.emitting = false;   // a mouse left resting here: wind down
+      if (fx.emitting && now - fx.lastWave >= SPARK_WAVE_GAP_MS){ addSparkWave(fx, now); fx.lastWave = now; }
+      ctx.clearRect(0, 0, W, H);
+      fx.particles = fx.particles.filter(function(p){ return drawSpark(ctx, p, now); });
+      if (fx.emitting || fx.particles.length) requestAnimationFrame(frame);
+      else { canvas.remove(); spot._sparks = null; }
+    };
+    requestAnimationFrame(frame);
+  }
+  function stopPodiumSparks(spot){ if (spot._sparks) spot._sparks.emitting = false; }
+  // One V: two streams of sparks from the avatar's lower-left / lower-right edge, up and out
+  function addSparkWave(fx, now){
+    var w = fx.wave++ % SPARK_WAVES, perArm = fx.first ? 3 : 2;
+    var half = 30 + w * 5;                                     // 30° … 60° from straight up, wider each wave
+    var reach = (fx.first ? 80 : 70) * (.82 + Math.random() * .22);
+    [-1, 1].forEach(function(side){
+      var arm = (-90 + side * half) * Math.PI / 180;
+      for (var j = 0; j < perArm; j++){
+        var a = arm + (Math.random() - .5) * .12;              // a narrow stream, not a perfect line
+        var dist = reach * (.55 + .45 * (j + 1) / perArm) + Math.random() * 6;
+        var star = (w + j) % 4 === 1;
+        fx.particles.push({
+          x:fx.ox + side * fx.r * .7, y:fx.oy + fx.r * .7,     // starts at the edge, behind the avatar
+          dx:Math.cos(a) * dist, dy:Math.sin(a) * dist,
+          start:now + j * 24, dur:550 + Math.random() * 200,   // each arm a stream shooting out
+          size:star ? 8 : 3.5 + Math.random() * 2.5, star:star, spin:star ? Math.random() * Math.PI : 0,
+          color:fx.colors[(w + j + (side > 0 ? 1 : 0)) % fx.colors.length]
+        });
+      }
+    });
+  }
+  // Draws one spark at this moment; false once it has finished
+  function drawSpark(ctx, p, now){
+    var t = (now - p.start) / p.dur;
+    if (t < 0) return true;
+    if (t >= 1) return false;
+    var e = 1 - Math.pow(1 - t, 3);                            // fast out, easing to a stop
+    var alpha = t < .08 ? t / .08 : t > .7 ? (1 - t) / .3 : 1;
+    var s = p.size * (.2 + .8 * e) / 2;
+    ctx.save();
+    ctx.translate(p.x + p.dx * e, p.y + p.dy * e);
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = p.color;
+    if (p.star){
+      ctx.rotate(p.spin * e);
+      ctx.beginPath();                                         // a four-point star
+      for (var k = 0; k < 8; k++){
+        var rad = k % 2 ? s * .32 : s, ang = k * Math.PI / 4 - Math.PI / 2;
+        ctx[k ? "lineTo" : "moveTo"](Math.cos(ang) * rad, Math.sin(ang) * rad);
+      }
+      ctx.closePath(); ctx.fill();
+    } else {
+      ctx.globalAlpha = alpha * .35;                           // a soft halo, then the dot
+      ctx.beginPath(); ctx.arc(0, 0, s * 1.7, 0, Math.PI * 2); ctx.fill();
+      ctx.globalAlpha = alpha;
+      ctx.beginPath(); ctx.arc(0, 0, s, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.restore();
+    return true;
+  }
+  function cssVarOf(el, name, fallback){ return getComputedStyle(el).getPropertyValue(name).trim() || fallback; }
+
   // Most active riders as a leaderboard: the top three on a podium (2 · 1 · 3, the leader raised), everyone after
   // ranked below with a bar against the leader's distance. Rank is shown as a number everywhere; the medal
   // colours only add to it.
@@ -2644,13 +2797,19 @@
   function buildLeaderboardHtml(riders, isIntro){
     var lead = riders.length ? riders[0].count : 1;
     var meta = function(r){ return esc(r.moto) + ' · ' + t("toursCount", r.tours); };
+    // The rider's bike, pictured next to its name (an empty slot keeps rows aligned when a model has no picture)
+    var bike = function(r){
+      return '<span class="lb-bike" aria-hidden="true">'
+        + (r.motoImg ? '<img src="'+esc(r.motoImg)+'" alt="" loading="lazy">' : '') + '</span>';
+    };
     var podium = [1, 0, 2].filter(function(i){ return riders[i]; }).map(function(i){
       var r = riders[i];
       // Intro order: third place first, the winner last
       return '<div class="lb-spot lb-'+LB_MEDALS[i]+(i===0 ? ' is-first' : '')+'" style="--lb-delay:'+[2, 1, 0][i]*260+'ms">'
-        + '<div class="lb-avatar">'+initialOf(r.label)+'<span class="lb-medal" aria-label="'+esc(t("rankN", i+1))+'">'+(i+1)+'</span></div>'
+        + '<div class="lb-avatar">'+initialOf(r.label)+pfpImg(r.photo)+'<span class="lb-medal" aria-label="'+esc(t("rankN", i+1))+'">'+(i+1)+'</span></div>'
         + '<div class="lb-name">'+esc(r.label)+'</div>'
         + '<div class="lb-km" data-to="'+r.count+'">'+(isIntro ? '0' : fmtNum(r.count))+' km</div>'
+        + bike(r)
         + '<div class="lb-meta">'+meta(r)+'</div>'
         + '<div class="lb-step" aria-hidden="true"></div>'
         + '</div>';
@@ -2662,7 +2821,8 @@
         : '<div class="lb-fill" style="width:'+pct+'%"></div>';
       return '<li class="lb-row">'
         + '<span class="lb-rank">'+(j+4)+'</span>'
-        + '<span class="lb-avatar sm">'+initialOf(r.label)+'</span>'
+        + pfpHtml(r.label, r.photo)
+        + bike(r)
         + '<div class="lb-who"><div class="lb-name">'+esc(r.label)+'</div><div class="lb-meta">'+meta(r)+'</div></div>'
         + '<div class="lb-bar" aria-hidden="true">'+fill+'</div>'
         + '<span class="lb-km">'+fmtNum(r.count)+' km</span>'
@@ -2697,6 +2857,41 @@
 
   // Cards whose second view is a donut (tableHtml holds it) instead of a table, and the box it sits in
   var DONUT_CARDS = { domicile:"map", moto:"auto" };
+  // A card's view toggle (chart ↔ table / donut / map): the old view fades out, the card eases to the new view's
+  // height while the new view fades in. Reduced motion: switches at once.
+  var cardViewBusy = false;
+  function switchCardView(btn){
+    var id = btn.getAttribute("data-toggle-chart");
+    var calm = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var oldCard = btn.closest(".card");
+    if (calm || !oldCard){ state.dashChartView[id] = !state.dashChartView[id]; renderDashboard(); return; }
+    if (cardViewBusy) return;
+    cardViewBusy = true;
+    var fromH = oldCard.offsetHeight;
+    oldCard.classList.add("view-out");
+    setTimeout(function(){
+      state.dashChartView[id] = !state.dashChartView[id];
+      renderDashboard();
+      var newBtn = document.querySelector('#dashboard-view [data-toggle-chart="'+id+'"]');
+      var card = newBtn && newBtn.closest(".card");
+      if (!card){ cardViewBusy = false; return; }
+      var toH = card.offsetHeight;
+      card.style.height = fromH + "px";
+      card.style.overflow = "hidden";
+      card.classList.add("view-in");
+      void card.offsetHeight;   // start from the old height
+      card.style.transition = "height .32s cubic-bezier(.2,.8,.2,1)";
+      card.style.height = toH + "px";
+      var done = function(){
+        card.style.height = card.style.overflow = card.style.transition = "";
+        card.classList.remove("view-in");
+        cardViewBusy = false;
+      };
+      setTimeout(done, 360);
+      newBtn.focus({ preventScroll:true });
+    }, 140);
+  }
+
   function buildCard(id, title, sub, wide, chartHtml, tableHtml, legendHtml, introDelayMs){
     var showTable = !!state.dashChartView[id];
     var cls = "card" + (wide?" wide":"") + (introDelayMs!=null?" intro-pop":"");
@@ -2780,7 +2975,7 @@
       markEdited: "Edited {0} by {1}", markAdded: "Added {0} by {1}",
       itinTitle: "Itinerary & route", mapAllDays: "All days", tourTabItin: "Overview", tourTabItinEdit: "Edit itinerary", tourTabPkg: "Packages", mapTraffic: "Traffic", mapLoading: "Loading map…",
       mapGoogleFailed: "Google Maps didn't accept the key — showing the backup map", mapLayersLabel: "Map style", mapLayerStreet: "Map", mapLayerSatellite: "Satellite", mapLayerTopo: "Terrain",
-      mapRecenter: "Recenter on the route", mapOffline: "The map needs an internet connection.",
+      mapRecenter: "Recenter on the route", mapRecenterAreas: "Show all areas", mapZoomIn: "Zoom in", mapZoomOut: "Zoom out",mapOffline: "The map needs an internet connection.",
       mapApprox: "Exact place not found, so it is pinned at a nearby area — check it: {0}",
       kindStart: "Start", kindFinish: "Finish", kindFuel: "Gas station", kindFood: "Food stop", kindHotel: "Hotel", kindRest: "Rest area", kindPhoto: "Photo stop",
       kindCafe: "Café / coffee", kindVilla: "Villa", kindMosque: "Mosque / prayer", kindAuto: "Auto", fieldKind: "Type",
@@ -2927,11 +3122,8 @@
       statActiveRoutes: "Active Touring", statApprovedMembers: "Approved Members",
       dashboardActivityTitle: "Recent Activity", dashboardViewAll: "View all",
 
-      range7: "7 days", range30: "30 days", range90: "90 days",
       kpiRevenue: "Membership fees", kpiRevenueSub: "last {0} days",
-      kpiMembers: "Active members", kpiNewMembers: "+{0} approved in range",
-      kpiPending: "Awaiting review", kpiPendingSub: "{0} payment not verified yet",
-      kpiProofs: "Proofs to check", kpiProofsSub: "{0} applications · {1} orders · {2} touring",
+      kpiMembers: "Total members", kpiNewMembers: "+{0} approved in the last 30 days",
       kpiApprovalTime: "Median review time", kpiApprovalTimeSub: "submission → decision",
       vsPrev: "vs previous {0} days",
       chartRevenue: "Membership fees received",
@@ -3027,7 +3219,7 @@
       markEdited: "Diedit {0} oleh {1}", markAdded: "Ditambahkan {0} oleh {1}",
       itinTitle: "Itinerari & Titik Rute", mapAllDays: "Semua hari", tourTabItin: "Ringkasan", tourTabItinEdit: "Ubah itinerari", tourTabPkg: "Paket", mapTraffic: "Lalu lintas", mapLoading: "Memuat peta…",
       mapGoogleFailed: "Google Maps menolak kuncinya — memakai peta cadangan", mapLayersLabel: "Tampilan peta", mapLayerStreet: "Peta", mapLayerSatellite: "Satelit", mapLayerTopo: "Topografi",
-      mapRecenter: "Kembali ke rute", mapOffline: "Peta butuh koneksi internet.",
+      mapRecenter: "Kembali ke rute", mapRecenterAreas: "Tampilkan semua area", mapZoomIn: "Perbesar", mapZoomOut: "Perkecil",mapOffline: "Peta butuh koneksi internet.",
       mapApprox: "Tempat persisnya tidak ditemukan, jadi ditandai di area terdekat — periksa: {0}",
       kindStart: "Titik mulai", kindFinish: "Titik akhir", kindFuel: "SPBU", kindFood: "Tempat makan", kindHotel: "Hotel", kindRest: "Rest area", kindPhoto: "Spot foto",
       kindCafe: "Kafe / ngopi", kindVilla: "Villa", kindMosque: "Masjid / musala", kindAuto: "Otomatis", fieldKind: "Jenis",
@@ -3174,11 +3366,8 @@
       statActiveRoutes: "Touring Aktif", statApprovedMembers: "Anggota Disetujui",
       dashboardActivityTitle: "Aktivitas Terbaru", dashboardViewAll: "Lihat semua",
 
-      range7: "7 hari", range30: "30 hari", range90: "90 hari",
       kpiRevenue: "Iuran pendaftaran", kpiRevenueSub: "{0} hari terakhir",
-      kpiMembers: "Anggota aktif", kpiNewMembers: "+{0} disetujui dalam periode",
-      kpiPending: "Menunggu tinjauan", kpiPendingSub: "{0} pembayaran belum terverifikasi",
-      kpiProofs: "Bukti untuk dicek", kpiProofsSub: "{0} pendaftaran · {1} pesanan · {2} touring",
+      kpiMembers: "Total anggota", kpiNewMembers: "+{0} disetujui 30 hari terakhir",
       kpiApprovalTime: "Median waktu tinjau", kpiApprovalTimeSub: "pengajuan → keputusan",
       vsPrev: "vs {0} hari sebelumnya",
       chartRevenue: "Iuran pendaftaran diterima",
@@ -3245,7 +3434,7 @@
     memberTab:"pending", merchTab:"products", touringTab:"upcoming", agendaTab:"upcoming",
     query:"", openDetail:null, openReject:null, openResubmit:null, editKey:null, openReg:null, itinModal:null, sheet:null, regFilter:null, regWin:null, mapDay:{}, tourTab:{}, mapLayer:"street", mapTraffic:false, plan:{},
     addPanelOpen:false,
-    dashRange:30, dashChartView:{}, dashboardIntroPending:false
+    dashChartView:{}, dashboardIntroPending:false
   };
 
   function countBy(list, key){ return list.filter(function(m){ return m.status===key; }).length; }
@@ -3344,6 +3533,7 @@
   // ---------- EDIT MARKS ----------
   // Items added or edited in the panel carry who/when, shown as a small mark so admins can spot recent changes
   var ADMIN_NAME = "Marshall Adiwijaya";
+  var ADMIN_PHOTO = "";   // the signed-in admin's Google photo, once real sign-in fills it in (the "M" shows until then)
   var ID_MONTHS = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
   function stampText(ms){
     var d = new Date(ms);
@@ -3586,6 +3776,24 @@
   function fmtNum(n){ return Math.round(n).toLocaleString(state.lang==="id" ? "id-ID" : "en-GB"); }
   function fmtDuration(min){ return t("durHM", Math.floor(min/60), min%60); }
   function initialOf(name){ return esc((name||"?").trim().charAt(0).toUpperCase()); }
+  // A person's photo (e.g. from their Google account, kept as `photo` on their record), when there is one: their
+  // own record's, else the member record it points to (by id, or by name for records that only keep a name).
+  function photoOf(x){
+    if (!x) return "";
+    if (x.photo) return x.photo;
+    var name = x.name || x.buyer;
+    var m = x.memberId!=null ? members.filter(function(mm){ return mm.id===x.memberId; })[0]
+      : name ? members.filter(function(mm){ return mm.name===name && mm.photo; })[0] : null;
+    return (m && m.photo) || "";
+  }
+  // The photo laid over the initial; if it fails to load it removes itself and the initial shows again
+  function pfpImg(photo){
+    return photo ? '<img class="pfp-photo" src="'+esc(photo)+'" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">' : '';
+  }
+  // A person's picture: their photo, or their initial in a circle, the same as on the dashboard leaderboard
+  function pfpHtml(name, photo){ return '<span class="lb-avatar sm" aria-hidden="true">'+initialOf(name)+pfpImg(photo)+'</span>'; }
+  // A table's name cell with the picture beside the name (and whatever sits under it)
+  function withPfp(name, inner, photo){ return '<div class="cell-person">'+pfpHtml(name, photo)+'<div class="cell-person-main">'+inner+'</div></div>'; }
 
   // Reusable tab strip: tabs = [{key,labelKey}], countFn(key) → number, onPick(key)
   function renderTabStrip(tabs, activeKey, countFn, onPick){
@@ -3887,13 +4095,36 @@
   }
 
   // Closing goes through the same paths as the buttons inside, so drafts and state are cleared the usual way
+  // Closing a window only fades it (no movement), then it's gone. Reduced motion, or a window drawn inside the
+  // touring window (is-hosted): gone at once. `after` runs once it's hidden.
+  function calmMotion(){ return !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches); }
+  function fadeHideOverlay(el, after){
+    var hide = function(){ el.classList.remove("is-closing"); el.hidden = true; if (after) after(); };
+    if (el.hidden || el.classList.contains("is-closing")) return;
+    if (calmMotion() || el.classList.contains("is-hosted")){ hide(); return; }
+    el.classList.add("is-closing");
+    el._fadeTimer = setTimeout(function(){ if (el.classList.contains("is-closing")) hide(); }, 160);
+  }
+  // Opening a window, also when it's reopened while still fading out
+  function showOverlay(el){
+    clearTimeout(el._fadeTimer);
+    el.classList.remove("is-closing");
+    el.hidden = false;
+  }
+
   function closeRowWindow(tr){
     var cancel = tr.querySelector("[data-edit-cancel], [data-cancel-reject]");
     if (cancel){ cancel.click(); return; }
-    state.openDetail = null;
-    state.openReject = null;
-    state.openResubmit = null;
-    renderTableOnly();
+    var close = function(){
+      state.openDetail = null;
+      state.openReject = null;
+      state.openResubmit = null;
+      renderTableOnly();
+    };
+    if (calmMotion()){ close(); return; }
+    if (tr.classList.contains("rowwin-leave")) return;
+    tr.classList.add("rowwin-leave");
+    setTimeout(close, 160);
   }
 
   function initRowWindows(){
@@ -3911,7 +4142,7 @@
       var tr = topRowWindow();
       if (!tr || picker) return;
       // Windows opened on top (activation check, log, merch variants…) handle their own keys
-      if (Array.prototype.some.call(document.querySelectorAll(".modal-overlay:not(.is-hosted)"), function(o){ return !o.hidden; })) return;
+      if (Array.prototype.some.call(document.querySelectorAll(".modal-overlay:not(.is-hosted)"), function(o){ return !o.hidden && !o.classList.contains("is-closing"); })) return;
       var td = tr.firstElementChild;
       if (e.key==="Escape"){
         e.preventDefault();
@@ -4051,9 +4282,7 @@
   function runDashboardIntro(m, tiles){
     triggerVizGrow();
     var kpiJobs = [
-      { id:"kpi-members-value", to:m.members.active, fmt:function(v){ return Math.round(v).toLocaleString(state.lang==="id"?"id-ID":"en-GB"); }, dur:900 },
-      { id:"kpi-pending-value", to:m.members.pending, fmt:function(v){ return Math.round(v); }, dur:700 },
-      { id:"kpi-proofs-value", to:m.checks.memberProofs + m.checks.orderProofs + m.checks.regProofs, fmt:function(v){ return Math.round(v); }, dur:700 }
+      { id:"kpi-members-value", to:m.members.active, fmt:function(v){ return Math.round(v).toLocaleString(state.lang==="id"?"id-ID":"en-GB"); }, dur:900 }
     ];
     kpiJobs.forEach(function(job, i){
       setTimeout(function(){ animateCountUp(document.getElementById(job.id), job.to, job.fmt, job.dur); }, i*70);
@@ -4070,23 +4299,10 @@
     var isIntro = state.dashboardIntroPending;
     state.dashboardIntroPending = false;
     var wrap = document.getElementById("dashboard-view");
-    var m = getMetrics(state.dashRange);
-    var rangeTabsHtml = [7,30,90].map(function(r){
-      return '<button type="button" class="tab'+(m.range===r?" active":"")+'" data-range="'+r+'">'+t("range"+r)+'</button>';
-    }).join("");
+    var m = getMetrics(DASH_RANGE_DAYS);
 
-    var kpiPopStyle = function(i){ return isIntro ? ' intro-pop" style="animation-delay:'+(i*70)+'ms' : ""; };
+    // Pending reviews and proofs to check aren't repeated here: the sidebar badges already count them
     var kpiMembersTxt = isIntro ? "0" : m.members.active.toLocaleString(state.lang==="id"?"id-ID":"en-GB");
-    var kpiPendingTxt = isIntro ? "0" : m.members.pending;
-    var kpiProofsTxt = isIntro ? "0" : (m.checks.memberProofs + m.checks.orderProofs + m.checks.regProofs);
-
-    var kpiHtml = ''
-      + '<div class="kpi'+kpiPopStyle(0)+'"><div class="kpi-label">'+t("kpiMembers")+'</div><div class="kpi-value" id="kpi-members-value">'+kpiMembersTxt+'</div>'
-      + '<div class="kpi-sub">'+t("kpiNewMembers", m.members.approvedInRange)+'</div></div>'
-      + '<div class="kpi'+kpiPopStyle(1)+'"><div class="kpi-label">'+t("kpiPending")+'</div><div class="kpi-value" id="kpi-pending-value">'+kpiPendingTxt+'</div>'
-      + '<div class="kpi-sub">'+t("kpiPendingSub", m.members.pendingUnverified)+'</div></div>'
-      + '<div class="kpi'+kpiPopStyle(2)+'"><div class="kpi-label">'+t("kpiProofs")+'</div><div class="kpi-value" id="kpi-proofs-value">'+kpiProofsTxt+'</div>'
-      + '<div class="kpi-sub">'+t("kpiProofsSub", m.checks.memberProofs, m.checks.orderProofs, m.checks.regProofs)+'</div></div>';
 
     var cardDelay = function(i){ return isIntro ? 350+i*70 : null; };
 
@@ -4110,7 +4326,10 @@
       buildMiniTable([t("colRoute"), t("colRiders"), t("colShare")], recentTours.map(function(r){ return [r.name, r.riders, riderPct(r.riders)+"%"]; })),
       null, cardDelay(3));
 
+    // Active members lead the riding totals (it was its own box above the other KPIs)
     var rideStatsHtml = '<div class="ride-stats">'
+      + '<div class="ride-stat"><div class="k">'+t("kpiMembers")+'</div><div class="v" id="kpi-members-value">'+kpiMembersTxt+'</div>'
+      + '<div class="s">'+t("kpiNewMembers", m.members.approvedInRange)+'</div></div>'
       + '<div class="ride-stat"><div class="k">'+t("rideTotalKm")+'</div><div class="v">'+fmtNum(m.rideTotals.km)+' km</div></div>'
       + '<div class="ride-stat"><div class="k">'+t("rideTotalTime")+'</div><div class="v">'+t("hours", fmtNum(m.rideTotals.minutes/60))+'</div></div>'
       + '<div class="ride-stat"><div class="k">'+t("rideToursDone")+'</div><div class="v">'+m.rideTotals.tours+'</div></div>'
@@ -4123,8 +4342,6 @@
 
     keepDomicileMap();
     wrap.innerHTML = '<div class="chart-grid">'+ridersCard+'</div>'
-      + '<div class="dash-filters"><div class="tabs">'+rangeTabsHtml+'</div></div>'
-      + '<div class="kpi-grid">'+kpiHtml+'</div>'
       + '<div class="chart-grid">'+commCard+motoCard+touringCard+'</div>';
 
     fitCharts(isIntro);
@@ -4305,7 +4522,7 @@
     tbody.innerHTML = rows.map(function(m){
       var html = "";
       html += '<tr class="data-row" data-id="'+m.id+'">';
-      html += '<td><div class="cell-name">'+esc(m.name)+'</div>'+subParts([esc(m.community), "joined "+(m.submitted||m.decidedOn)])+'</td>';
+      html += '<td>'+withPfp(m.name, '<div class="cell-name">'+esc(m.name)+'</div>'+subParts([esc(m.community), "joined "+(m.submitted||m.decidedOn)]), photoOf(m))+'</td>';
       html += '<td data-label="'+t("colMotorcycle")+'">'+esc(m.moto)+'</td>';
       html += '<td data-label="'+t("colCommunity")+'">'+esc(m.community)+'</td>';
       html += '<td data-label="'+t("colPayment")+'">'+paymentChip(m, "member")+'</td>';
@@ -4382,7 +4599,7 @@
 
     tbody.innerHTML = rows.map(function(m){
       var html = '<tr class="data-row" data-id="'+m.id+'">'
-        + '<td class="cell-name">'+esc(m.name)+'</td>'
+        + '<td>'+withPfp(m.name, '<div class="cell-name">'+esc(m.name)+'</div>', photoOf(m))+'</td>'
         + '<td data-label="'+t("colMotorcycle")+'">'+esc(m.moto)+'</td>'
         + '<td data-label="'+t("colCommunity")+'">'+esc(m.community)+'</td>'
         + '<td data-label="'+t("colKodeKomunitas")+'"><div class="code-line"><span class="dot"></span>'+esc(m.code)+'</div></td>'
@@ -4406,9 +4623,19 @@
     var stats = m.stats || { km:0, minutes:0, tours:0 };
     var garage = garageOf(m);
 
+    // A garage bike's picture: the member's own photo (`photo`, from the member app), else the model's stock
+    // picture, else the bike icon underneath. A photo that fails to load drops to the stock picture, then the icon.
+    var bikeThumb = function(v){
+      var stock = MOTO_IMAGES[(v.name || "").replace(/^Royal Enfield /, "")] || "";
+      var src = v.photo || stock;
+      var img = src ? '<img class="garage-bike-img'+(v.photo ? '' : ' is-stock')+'" src="'+esc(src)+'" alt="" loading="lazy" referrerpolicy="no-referrer"'
+        + (v.photo && stock ? ' data-stock="'+esc(stock)+'"' : '')
+        + ' onerror="if(this.dataset.stock){this.src=this.dataset.stock;this.removeAttribute(\'data-stock\');this.classList.add(\'is-stock\')}else{this.remove()}">' : '';
+      return '<div class="garage-bike">'+ITEM_ICONS.moto+img+'</div>';
+    };
     var motorsHtml = garage.motors.length
       ? '<div class="garage-grid">' + garage.motors.map(function(v){
-          return '<div class="garage-card"><div class="item-thumb">'+ITEM_ICONS.moto+'</div><div>'
+          return '<div class="garage-card">'+bikeThumb(v)+'<div>'
             + '<div class="garage-name">'+esc(v.name)+'</div>'
             + '<div class="garage-plate">'+esc(v.plate)+'</div>'
             + (v.color ? '<div class="cell-sub">'+esc(v.color)+'</div>' : '')
@@ -4606,7 +4833,7 @@
       var flow = ORDER_FLOW[o.status];
       var html = '<tr class="data-row" data-id="'+o.id+'">';
       html += '<td><div class="cell-name">'+esc(o.orderNo)+'</div><div class="cell-sub">'+esc(o.items)+'</div></td>';
-      html += '<td data-label="'+t("colBuyer")+'">'+esc(o.buyer)+'</td>';
+      html += '<td data-label="'+t("colBuyer")+'">'+withPfp(o.buyer, esc(o.buyer), photoOf(o))+'</td>';
       html += '<td data-label="'+t("colTotal")+'"><div>'+esc(rupiah(o.total))+'</div><div class="cell-chip">'+paymentChip(o, "order")+'</div></td>';
       html += '<td data-label="'+t("colStatus")+'"><span class="chip '+flow.chip+'">'+t(flow.labelKey)+'</span></td>';
       // A new order only moves to Processing once its transfer is verified
@@ -4864,13 +5091,13 @@
     state.openResubmit = null;
     if (firstToCheck){ var next = regNextToCheck(r); if (next) state.regWin.sel = next.id; }
     if (state.section==="touring") openTourTab(r.id, state.regWin.tab==="crew" ? "crew" : "riders");
-    else { renderRegWindow(); document.getElementById("reg-overlay").hidden = false; }
+    else { renderRegWindow(); showOverlay(document.getElementById("reg-overlay")); }
     var search = document.querySelector("#reg-overlay [data-regwin-q]");
     if (search && !state.regWin.sel && window.matchMedia("(min-width:761px)").matches) search.focus();
   }
   function closeRegWindow(){
     state.regWin = null; state.openResubmit = null;
-    document.getElementById("reg-overlay").hidden = true;
+    fadeHideOverlay(document.getElementById("reg-overlay"));
   }
   function regMatches(r, p, w){
     if (w.status && p.payment!==w.status) return false;
@@ -4908,6 +5135,7 @@
         + '<div class="reg-rows">'+shown.map(function(p){
             var pkg = packageOf(r, p), role = roleOf(p);
             return '<button type="button" class="reg-row'+(w.sel===p.id ? ' open' : '')+'" data-regwin-sel="'+p.id+'" aria-pressed="'+(w.sel===p.id)+'">'
+              + pfpHtml(p.name, photoOf(p))
               + '<span class="reg-row-main"><span class="cell-name">'+esc(p.name)+'</span>'
               + (role!=="Peserta" ? ' <span class="chip role-chip role-'+role.replace(/\s+/g,"-").toLowerCase()+'">'+esc(role)+'</span>' : '')
               + '<span class="cell-sub">'+(pkg ? esc(pkg.name) : t("regNoPackage"))+' &middot; '+esc(p.moto)+'</span></span>'
@@ -5054,7 +5282,7 @@
     function crewRowHtml(p){
       var pkg = packageOf(r, p);
       return '<tr>'
-        + '<td><div class="cell-name">'+esc(p.name)+'</div><div class="cell-sub">'+esc(p.moto)+'</div></td>'
+        + '<td>'+withPfp(p.name, '<div class="cell-name">'+esc(p.name)+'</div><div class="cell-sub">'+esc(p.moto)+'</div>', photoOf(p))+'</td>'
         + '<td data-label="'+esc(t("fieldPackage"))+'" class="cell-sub">'+esc(pkg ? pkg.name : "—")+'</td>'
         + '<td data-label="'+esc(t("colGroup"))+'"><select data-cr-group="'+p.id+'" aria-label="'+esc(t("colGroup")+" "+p.name)+'">'+crewGroupOptions(r, p)+'</select></td>'
         + '<td data-label="'+esc(t("colRole"))+'"><select data-cr-role="'+p.id+'" aria-label="'+esc(t("colRole")+" "+p.name)+'">'+crewRoleOptions(roleOf(p))+'</select></td>'
@@ -5906,8 +6134,7 @@
     el.innerHTML = "";
     var map = new gm.Map(el, {
       styles:dark ? GMAP_STYLE_DARK : GMAP_STYLE_LIGHT, backgroundColor:dark ? "#1f1f22" : "#e8e4de",
-      disableDefaultUI:true, zoomControl:true, clickableIcons:false, keyboardShortcuts:false,
-      zoomControlOptions:{ position:gm.ControlPosition.LEFT_TOP }, gestureHandling:"cooperative",
+      disableDefaultUI:true, clickableIcons:false, keyboardShortcuts:false, gestureHandling:"cooperative",
       isFractionalZoomEnabled:true   // lets fitBounds fill the card instead of stopping a whole zoom level short
     });
     var polys = {};
@@ -5948,7 +6175,20 @@
     layer.setMap(map);
     var bounds = new gm.LatLngBounds();
     domicileBounds(areas).forEach(function(p){ bounds.extend({ lat:p[0], lng:p[1] }); });
-    if (areas.length) map.fitBounds(bounds, 8); else { map.setCenter({ lat:-6.3, lng:106.83 }); map.setZoom(9); }
+    // Frames every area; the recenter button calls it again
+    var fitAll = function(){
+      if (areas.length) map.fitBounds(bounds, 8); else { map.setCenter({ lat:-6.3, lng:106.83 }); map.setZoom(9); }
+    };
+    var recenter = document.createElement("button");
+    recenter.type = "button";
+    recenter.className = "gmap-ctl gmap-recenter";
+    recenter.title = t("mapRecenterAreas");
+    recenter.setAttribute("aria-label", t("mapRecenterAreas"));
+    recenter.innerHTML = RECENTER_SVG;
+    recenter.addEventListener("click", function(){ hideVizTooltip(); fitAll(); });
+    addGmapZoom(map);
+    map.controls[gm.ControlPosition.LEFT_TOP].push(recenter);
+    fitAll();
   }
   function drawDomicileLeaflet(el, areas){
     var dark = document.documentElement.getAttribute("data-theme")!=="light";
@@ -5972,8 +6212,23 @@
       L.marker(a.at, { icon:L.divIcon({ className:"dom-count-pos", html:a.labelHtml, iconSize:null }), keyboard:false }).addTo(map)
         .on("mouseover", function(){ hover(true); }).on("mouseout", function(){ hover(false); });
     });
-    if (areas.length) map.fitBounds(domicileBounds(areas), { padding:[8, 8] });
-    else map.setView([-6.3, 106.83], 9);
+    // Frames every area; the recenter button calls it again
+    var fitAll = function(animate){
+      if (areas.length) map.fitBounds(domicileBounds(areas), { padding:[8, 8], animate:!!animate });
+      else map.setView([-6.3, 106.83], 9, { animate:!!animate });
+    };
+    var RecenterControl = L.Control.extend({
+      options:{ position:"topleft" },
+      onAdd:function(){
+        var bar = L.DomUtil.create("div", "leaflet-bar leaflet-control map-recenter");
+        bar.innerHTML = '<a href="#" role="button" title="'+esc(t("mapRecenterAreas"))+'" aria-label="'+esc(t("mapRecenterAreas"))+'">'+RECENTER_SVG+'</a>';
+        L.DomEvent.disableClickPropagation(bar);
+        L.DomEvent.on(bar, "click", function(e){ L.DomEvent.preventDefault(e); hideVizTooltip(); fitAll(true); });
+        return bar;
+      }
+    });
+    map.addControl(new RecenterControl());
+    fitAll(false);
   }
 
   // ---------- TRAVEL TIME ----------
@@ -6420,6 +6675,29 @@
     { featureType:"water", elementType:"geometry", stylers:[{ color:"#bcd0dc" }] }
   ];
 
+  // Zoom buttons for the Google maps, in place of Google's own (always white) control; greyed out at the zoom limits.
+  // Pushed before the recenter button so it sits under them, as on the Leaflet maps.
+  var ZOOM_IN_SVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
+  var ZOOM_OUT_SVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>';
+  function addGmapZoom(map){
+    var gm = google.maps, MIN = 3, MAX = 20;
+    var box = document.createElement("div");
+    box.className = "gmap-ctl gmap-zoom";
+    box.setAttribute("role", "group");
+    box.innerHTML = '<button type="button" data-zoom="1" title="'+esc(t("mapZoomIn"))+'" aria-label="'+esc(t("mapZoomIn"))+'">'+ZOOM_IN_SVG+'</button>'
+      + '<button type="button" data-zoom="-1" title="'+esc(t("mapZoomOut"))+'" aria-label="'+esc(t("mapZoomOut"))+'">'+ZOOM_OUT_SVG+'</button>';
+    var zin = box.children[0], zout = box.children[1];
+    var sync = function(){ var z = map.getZoom(); zin.disabled = z >= MAX; zout.disabled = z <= MIN; };
+    box.addEventListener("click", function(e){
+      var b = e.target.closest ? e.target.closest("[data-zoom]") : null;
+      if (!b || b.disabled) return;
+      var z = Math.round(map.getZoom() || 8) + Number(b.getAttribute("data-zoom"));
+      map.setZoom(Math.max(MIN, Math.min(MAX, z)));
+    });
+    map.addListener("zoom_changed", sync);
+    map.controls[gm.ControlPosition.LEFT_TOP].push(box);
+  }
+
   function drawGoogleMap(el, tr){
     var model = buildMapModel(tr);
     var gm = google.maps;
@@ -6430,8 +6708,7 @@
       mapTypeId:GMAP_TYPES[state.mapLayer] || "roadmap",
       styles:dark ? GMAP_STYLE_DARK : GMAP_STYLE_LIGHT,
       backgroundColor:dark ? "#1f1f22" : "#e8e4de",
-      disableDefaultUI:true, zoomControl:true, clickableIcons:false,
-      zoomControlOptions:{ position:gm.ControlPosition.LEFT_TOP },
+      disableDefaultUI:true, clickableIcons:false,
       // One finger drags the map; the mouse wheel keeps scrolling the page (pinch and +/− zoom)
       gestureHandling:"greedy", scrollwheel:false
     });
@@ -6473,6 +6750,7 @@
     recenter.setAttribute("aria-label", t("mapRecenter"));
     recenter.innerHTML = RECENTER_SVG;
     recenter.addEventListener("click", function(){ info.close(); fitView(); });
+    addGmapZoom(map);
     map.controls[gm.ControlPosition.LEFT_TOP].push(recenter);
 
     model.legs.forEach(function(leg){
@@ -6513,13 +6791,13 @@
   // state.sheet holds the draft for whichever table pop-up is open: { type:"pkg"|"crew", touringId, ... }.
   // Nothing on the touring changes until Save.
   function sheetTouring(){ return touringRoutes.find(function(r){ return r.id==state.sheet.touringId; }); }
-  function showSheet(){ document.getElementById("sheet-overlay").hidden = false; }
+  function showSheet(){ showOverlay(document.getElementById("sheet-overlay")); }
   function closeSheet(skipRender){
     var el = document.getElementById("sheet-overlay");
     var hosted = el.classList.contains("is-hosted");
     state.sheet = null;
-    el.hidden = true;
-    if (hosted){ el.innerHTML = ""; if (!skipRender) renderTouringTable(); }
+    if (hosted){ el.hidden = true; el.innerHTML = ""; if (!skipRender) renderTouringTable(); }
+    else fadeHideOverlay(el);
   }
 
   function openPkgSheet(touringId){
@@ -6885,7 +7163,7 @@
     if (!(state.itinModal && state.itinModal.touringId===tr.id)) state.itinModal = itinDraftOf(tr);
     renderItinModal();
     if (isEventSection()) openTourTab(tr.id, "itinEdit");
-    else document.getElementById("itin-overlay").hidden = false;
+    else showOverlay(document.getElementById("itin-overlay"));
     var firstEmpty = document.querySelector('#itin-overlay input[data-f="time"]:placeholder-shown, #itin-overlay input[data-f="activity"]:placeholder-shown');
     var firstInput = firstEmpty || document.querySelector('#itin-overlay input[data-f="time"]');
     if (firstInput) firstInput.focus();
@@ -6897,8 +7175,8 @@
     var hosted = el.classList.contains("is-hosted");
     if (state.itinModal && state.tourTab[state.itinModal.touringId]==="itinEdit") state.tourTab[state.itinModal.touringId] = "itin";
     state.itinModal = null;
-    el.hidden = true;
-    if (hosted){ el.innerHTML = ""; if (!skipRender) renderTouringTable(); }
+    if (hosted){ el.hidden = true; el.innerHTML = ""; if (!skipRender) renderTouringTable(); }
+    else fadeHideOverlay(el);
   }
 
   // Copy what's typed in the table back into the draft rows
@@ -7228,11 +7506,11 @@
       + '<button type="button" class="'+(blocked ? 'btn-save' : 'btn-delete')+'" data-activate-setup="'+r.id+'">'+t("btnCompleteSetup")+'</button>'
       + (blocked ? '' : '<button type="button" class="btn-activate" data-activate-anyway="'+r.id+'">'+t("activateAnyway")+'</button>')
       + '</div></div>';
-    overlay.hidden = false;
+    showOverlay(overlay);
     var focus = overlay.querySelector("[data-activate-setup]");
     if (focus) focus.focus();
   }
-  function closeActivateCheck(){ document.getElementById("activate-overlay").hidden = true; }
+  function closeActivateCheck(){ fadeHideOverlay(document.getElementById("activate-overlay")); }
   function attachActivateEvents(){
     var overlay = document.getElementById("activate-overlay");
     overlay.addEventListener("click", function(e){
@@ -7327,7 +7605,7 @@
     else if (tab==="crew" || tourTakesRegistrations(r)){ ensureRegWin(r, tab==="crew" ? "crew" : "pay"); panel = tourHostSlot("reg"); }
     else {
       var list = people.map(function(p){
-        return '<div class="person"><div class="avatar">'+initialOf(p.name)+'</div>'
+        return '<div class="person">'+pfpHtml(p.name, photoOf(p))
           + '<div class="person-main"><div class="cell-name">'+esc(p.name)+'</div><div class="cell-sub">'+esc(p.moto)+(p.color ? ' &middot; '+esc(p.color) : '')+'</div></div>'
           + (p.lead ? '<span class="chip lead">'+t("chipLeader")+'</span>' : '<span class="chip plain">'+t("chipMember")+'</span>')
           + '</div>';
@@ -7379,7 +7657,7 @@
       var el = els[slot.getAttribute("data-tour-host")];
       slot.appendChild(el);
       el.classList.add("is-hosted");
-      el.hidden = false;
+      showOverlay(el);   // also cancels a fade-out still running from a stand-alone close
     });
     dropOrphanEditors();
   }
@@ -7506,7 +7784,7 @@
       + '<tbody id="log-tbody"></tbody></table></div>'
       + '</div>';
     renderAuditLogTable();
-    overlay.hidden = false;
+    showOverlay(overlay);
     document.getElementById("btn-auditlog").classList.add("active");
     document.getElementById("btn-auditlog").setAttribute("aria-expanded", "true");
     document.getElementById("log-search").focus();
@@ -7514,12 +7792,11 @@
 
   function closeLogWindow(){
     var overlay = document.getElementById("log-overlay");
-    if (overlay.hidden) return;
-    overlay.hidden = true;
-    overlay.innerHTML = "";
+    if (overlay.hidden || overlay.classList.contains("is-closing")) return;
     document.getElementById("btn-auditlog").classList.remove("active");
     document.getElementById("btn-auditlog").setAttribute("aria-expanded", "false");
     if (logWin.returnFocus && logWin.returnFocus.isConnected) logWin.returnFocus.focus();
+    fadeHideOverlay(overlay, function(){ overlay.innerHTML = ""; });
   }
 
   function initLogWindow(){
@@ -7554,7 +7831,7 @@
       var labelKey = AUDIT_CHIP_LABEL[a.type] || "chipAuditEdit";
       return '<tr>'
         + '<td class="cell-sub" data-label="'+t("colTimestamp")+'">'+esc(a.at)+'</td>'
-        + '<td data-label="'+t("colAdmin")+'">'+esc(a.admin)+'</td>'
+        + '<td data-label="'+t("colAdmin")+'">'+withPfp(a.admin, esc(a.admin), a.admin===ADMIN_NAME ? ADMIN_PHOTO : photoOf({ name:a.admin }))+'</td>'
         + '<td data-label="'+t("colActivity")+'"><span class="chip '+cls+'">'+t(labelKey)+'</span><div class="cell-sub">'+esc(a.desc)+'</div></td>'
         + '</tr>';
     }).join("");
@@ -7851,19 +8128,8 @@
     }
 
     document.getElementById("dashboard-view").addEventListener("click", function(e){
-      var rangeBtn = e.target.closest ? e.target.closest("[data-range]") : null;
-      if (rangeBtn){
-        state.dashRange = parseInt(rangeBtn.getAttribute("data-range"), 10);
-        renderDashboard();
-        return;
-      }
       var toggleBtn = e.target.closest ? e.target.closest("[data-toggle-chart]") : null;
-      if (toggleBtn){
-        var chartId = toggleBtn.getAttribute("data-toggle-chart");
-        state.dashChartView[chartId] = !state.dashChartView[chartId];
-        renderDashboard();
-        return;
-      }
+      if (toggleBtn){ switchCardView(toggleBtn); return; }
       var logBtn = e.target.closest ? e.target.closest("[data-open-log]") : null;
       if (logBtn){ openLogWindow(logBtn); return; }
       var gotoBtn = e.target.closest ? e.target.closest("[data-goto]") : null;
@@ -7878,6 +8144,9 @@
     });
 
     document.getElementById("dashboard-view").addEventListener("mouseover", function(e){
+      // Entering a podium spot (not moving within it): sparks until the mouse leaves it
+      var spot = e.target.closest ? e.target.closest(".lb-spot") : null;
+      if (spot && !(e.relatedTarget && spot.contains(e.relatedTarget))) startPodiumSparks(spot);
       var overlay = e.target.closest ? e.target.closest("[data-area-points]") : null;
       if (overlay){ handleAreaOverlayHover(overlay, e); return; }
       var el = e.target.closest ? e.target.closest("[data-tt]") : null;
@@ -7893,12 +8162,17 @@
       positionVizTooltip(e.clientX, e.clientY);
     });
     document.getElementById("dashboard-view").addEventListener("mouseout", function(e){
+      var leftSpot = e.target.closest ? e.target.closest(".lb-spot") : null;
+      if (leftSpot && !(e.relatedTarget && leftSpot.contains(e.relatedTarget))) stopPodiumSparks(leftSpot);
       var from = e.target.closest ? e.target.closest("[data-tt],[data-area-points]") : null;
       if (!from) return;
       var to = e.relatedTarget && e.relatedTarget.closest ? e.relatedTarget.closest("[data-tt],[data-area-points]") : null;
       if (from !== to) hideVizTooltip();
     });
-    document.getElementById("dashboard-view").addEventListener("mouseleave", hideVizTooltip);
+    document.getElementById("dashboard-view").addEventListener("mouseleave", function(){
+      hideVizTooltip();
+      Array.prototype.forEach.call(document.querySelectorAll("#dashboard-view .lb-spot"), stopPodiumSparks);
+    });
 
     document.getElementById("btn-menu").addEventListener("click", function(){
       var sidebar = document.querySelector(".sidebar");
@@ -8235,7 +8509,7 @@
       document.getElementById(id).addEventListener("click", function(){
         closeAccountMenu();
         closeSidebar();
-        document.getElementById("logout-overlay").hidden = false;
+        showOverlay(document.getElementById("logout-overlay"));
       });
     });
 
@@ -8243,7 +8517,7 @@
       var isCancel = e.target.id === "logout-overlay" || (e.target.closest && e.target.closest("#btn-logout-cancel"));
       var isConfirm = e.target.closest && e.target.closest("#btn-logout-confirm");
       if (isCancel){
-        document.getElementById("logout-overlay").hidden = true;
+        fadeHideOverlay(document.getElementById("logout-overlay"));
       }
       if (isConfirm){
         var confirmBtn = document.getElementById("btn-logout-confirm");
@@ -8438,6 +8712,8 @@
     refreshRideStats();   // members' km / tours and the tourings' rider counts, before anything shows them
     if (state.section==="dashboard" && !document.getElementById("view-app").hidden) state.dashboardIntroPending = true;
     applyStaticI18n();
+    var accountAvatar = document.querySelector(".avatar");
+    if (accountAvatar && ADMIN_PHOTO) accountAvatar.insertAdjacentHTML("beforeend", pfpImg(ADMIN_PHOTO));
     syncEventAnnouncements();
     renderAll();
     document.documentElement.classList.remove("booting");
